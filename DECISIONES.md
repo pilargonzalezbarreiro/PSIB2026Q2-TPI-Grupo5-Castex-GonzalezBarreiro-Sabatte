@@ -1,7 +1,7 @@
 # Decisiones del pipeline frente a la materia
 
 Criterio general:
-1. **La base es la materia.** No reemplazamos un método de la materia por uno equivalente de afuera (por ejemplo, no usamos "disimilitud" en lugar de contraste).
+1. **La base es la materia.** No reemplazamos un método de la materia por uno equivalente de afuera.
 2. **Construimos encima.** Donde el problema pide más (clasificar nódulos), agregamos medidas y pasos nuevos, preferentemente armados con herramientas de la materia usadas de otra forma (lo que borra la apertura, el esqueleto del entorno, el gradiente del borde).
 3. **Si el problema real obliga a hacer algo distinto** (nódulos chicos, distinto píxel, HU), se hace y se justifica acá.
 4. **Lo que agregamos no se da por bueno de antemano:** la estadística (05) y el puntaje (06) dicen si sirvió.
