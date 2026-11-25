@@ -8,6 +8,11 @@ reconstruidas):
   2. problema inverso: se reconstruye ese sinograma con distintos métodos y
      se compara contra la imagen original (que hace de "verdad").
 
+Los I0 de acá son NOMINALES ("dosis ref" = I0 de referencia de la
+simulación): sirven para comparar métodos de reconstrucción sobre la misma
+adquisición, no son fracciones de la dosis del estudio. Para eso está
+tpi/baja_dosis.py (Naziroglu et al. 2017), que usa el 07.
+
 Condiciones (cada una responde una pregunta de la materia):
   SBP vs FBP sin ruido ............ ¿por qué hace falta el filtro? (halo)
   FBP rampa con 3 dosis ........... ¿el ruido crece como 1/√dosis?
