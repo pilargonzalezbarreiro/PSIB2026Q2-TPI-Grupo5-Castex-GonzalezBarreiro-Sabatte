@@ -1,0 +1,12 @@
+parametro,descripcion,rho,porcentaje
+error_ruido,error al medir el ruido original,0.45343073571823184,36.75237218161658
+sigma_e2,ruido electrónico por lectura,-0.4265429380190836,32.52287853863331
+frac_no_cuantica,parte del ruido medido que no es cuántica,0.28953426201522764,14.98522926441406
+sff_bowtie,factor del bowtie (Kramer),0.24010482137992065,10.305408864196174
+vistas_rotacion,vistas por rotación,-0.1286249176110745,2.9574246223614957
+ancho_fila_mm,ancho de fila,0.0871657880736836,1.3581745466444006
+ventana,ventana del kernel (familia vecina),-0.04535031626840814,0.3676411410904343
+n_vistas_sim,vistas de la simulación,0.04351446679039788,0.33847827386964335
+mu_pmma,μ efectivo del PMMA del bowtie,0.032425785078126705,0.1879509238524311
+ancho_canal_mm,ancho de canal en el isocentro,0.03218374763722118,0.1851555324982368
+dsi_mm,distancia fuente-isocentro,0.0148247639221173,0.03928611082323484

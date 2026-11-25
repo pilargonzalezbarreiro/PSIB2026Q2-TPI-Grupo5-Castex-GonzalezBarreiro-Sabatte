@@ -1,0 +1,2180 @@
+
+######################################################################
+# ETAPA: todo
+######################################################################
+
+======================================================================
+Test de la simulación en el fantoma
+  python tests/test_baja_dosis.py
+======================================================================
+Fotones por rayo (centro): 486,111   σe² por rayo: 194   ventana cosine
+Ruido de la 'original': tejido 24.0 HU, pulmón 13.0 HU
+  ruido global (Christianson): sobre la imagen 22.3 HU, sobre el ruido solo 22.3 HU
+
+1. ×1: ruido agregado = 0.0 HU (método anterior, re-reconstruir sin ruido, ya cambia la imagen: RMSE 44.2 HU)
+
+2-3.  f     total compensado | adquisición real f·N | sin compensar | σ0/√f   (pulmón, HU)
+     0.5           18.8     |         19.0         |       23.4    |   18.5
+     0.25          27.6     |         28.3         |       30.7    |   26.1
+     0.1           48.1     |         48.7         |       49.9    |   41.3
+     0.05          79.5     |         79.5         |       79.2    |   58.4
+
+4. Ruido electrónico (σ total en pulmón / tejido, HU):
+   f=0.25  con   27.7 /   55.7   sin   25.9 /   45.3
+   f=0.05  con   80.0 /  258.0   sin   59.6 /  101.4
+
+5. Ventana del FBP -> textura del ruido (misma dosis, f = 0,25):
+   ramp         σ   47.5 HU   frecuencia media del NPS 0.51 ciclos/mm
+   shepp-logan  σ   38.4 HU   frecuencia media del NPS 0.47 ciclos/mm
+   hann         σ   17.8 HU   frecuencia media del NPS 0.29 ciclos/mm
+
+OK baja dosis
+
+[Test de la simulación en el fantoma: OK, 0.3 min]
+
+======================================================================
+Calibración y errores del ruido (07a)
+  python scripts/07a_calibrar_dosis.py
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+
+== Tags de exposición por fabricante (por qué se ancla con la corriente, mA) ==
+           exposicion_mas               tiempo_exposicion_ms              corriente_ma            
+                    count min  50%  max                count min 50%  max        count min 50% max
+fabricante                                                                                        
+GE                    123   1  880 7200                  123 400 570 1160          123  40 265 570
+PHILIPS                20 154  250  350                    0 NaN NaN  NaN           20 240 360 422
+SIEMENS                34  25 37.5  324                   26 500 500  600           34  50 105 561
+TOSHIBA                 1 130  130  130                    1 500 500  500            1 260 260 260
+Calibrando con 217 cortes (7 procesos)...
+
+Estudios con corriente y ruido medible: 178  |  calibración: ≥ 301 mA, validación (baja dosis de LIDC): ≤ 160 mA
+
+Constante del tubo Φ (fotones / (mA·mm²), absorbe tiempo de rotación y pitch); iqr_relativo = P75/P25 (1 = todos iguales):
+fabricante      phi  n_estudios  iqr_relativo
+     TODOS 2.83e+05          60          2.15
+        GE  2.4e+05          40          2.16
+   PHILIPS 6.05e+05          13           1.6
+(valor inicial de config: 2e+06)
+
+Φ_i por familia de kernel (si la ventana elegida para un kernel estuviera mal, se nota acá):
+                count      25%      50%      75%
+familia_kernel                                  
+duro               55 2.97e+05  3.7e+05 5.82e+05
+intermedio         12 2.45e+05 3.69e+05 4.12e+05
+suave             111 2.53e+05 3.71e+05 4.91e+05
+
+Anclaje por corriente × Φ del fabricante vs. por el ruido de cada estudio:
+   k = Φ_fab/Φ_i: mediana 0.73, P25 0.54, P75 1.00
+   etiqueta 1/2: en la mitad central de los estudios es de verdad entre 1/2.0 y 1/2.9
+   etiqueta 1/4: en la mitad central de los estudios es de verdad entre 1/4.0 y 1/6.6
+   etiqueta 1/10: en la mitad central de los estudios es de verdad entre 1/10.0 y 1/17.7
+   etiqueta 1/20: en la mitad central de los estudios es de verdad entre 1/20.0 y 1/36.3
+
+== Error de medición del ruido en cada imagen (mitades del tejido blando) ==
+   mediana 4.5 %, P90 18.8 %  (literatura, Christianson 2015: 3,4-4,7 %) -> en fotones ~9 %
+
+== Ruido que no baja con la dosis (σ0² = cuántico/mA + b) ==
+   fracción del ruido medido que NO es cuántica (mediana entre estudios, IC 95 % por bootstrap):
+fabricante  n_estudios     b  b_ic95_inf  b_ic95_sup  frac_no_cuantica_mediana  frac_no_cuantica_ic95_inf  frac_no_cuantica_ic95_sup
+     TODOS         178 0.191       0.109       0.279                     0.381                      0.217                      0.556
+        GE         123 0.166      0.0817       0.255                     0.333                      0.164                      0.511
+   PHILIPS          20  0.08    -0.00893        0.16                     0.642                          0                          1
+   SIEMENS          34 0.603       0.157        1.26                     0.521                      0.136                          1
+
+== Φ dentro de cada modelo de tomógrafo: dispersión observada vs la que daría solo medir mal el ruido ==
+fabricante            modelo  n_estudios  dispersion_phi  dispersion_esperada_por_medicion  cociente
+        GE   LightSpeed Plus          18            0.67                              0.40      1.69
+        GE LightSpeed Pro 16          14            0.51                              0.09      5.50
+        GE   LightSpeed QX/i           6            1.20                              0.26      4.65
+        GE  LightSpeed Ultra          28            0.34                              0.09      3.63
+        GE    LightSpeed VCT          14            0.47                              0.11      4.11
+        GE      LightSpeed16          42            0.39                              0.08      5.12
+   PHILIPS    Brilliance 16P          14            0.53                              0.26      2.00
+   PHILIPS     Brilliance 40           4            0.39                              0.13      3.05
+   SIEMENS      Sensation 16          20            0.40                              0.04     10.27
+   SIEMENS      Sensation 64          12            0.62                              0.06     11.03
+   cociente mediano 4.4: > 1 -> los estudios de un mismo modelo difieren de verdad; el anclaje por ruido/híbrido evita ese error (ver incertidumbre_dosis.py para el intervalo de cada uno)
+
+Validación (93 cortes de baja dosis), sin electrónico: error relativo mediano +24 %  (P25 +11 %, P75 +42 %)
+
+Validación (93 cortes de baja dosis), con electrónico: error relativo mediano +52 %  (P25 +31 %, P75 +73 %)
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/07a_calibracion.png
+
+[Calibración y errores del ruido (07a): OK, 4.6 min]
+
+======================================================================
+07 con anclaje por corriente × Φ
+  python scripts/07_baja_dosis.py --anclaje mas
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Simulando 217 nódulos × 7 condiciones (T = -475 HU, cierre 20 mm) con 7 procesos...
+  constante del tubo: 07a (calibrado con LIDC); ruido electrónico: sí
+  20/217
+  40/217
+  60/217
+  80/217
+  100/217
+  120/217
+  140/217
+  160/217
+  180/217
+  200/217
+  217/217
+
+Población: 112 nódulos de entrenamiento {'benigno': 56, 'sospechoso': 56}
+
+== a. Segmentación en cada condición ==
+             ruido_agregado_hu  ruido_total_pulmon_hu  mas_equivalente    n  frac_calcio_media  dice_medio  aceptables
+condicion                                                                                                             
+original                 0.000                 19.813            240.0  112              0.153       0.892       1.000
+dosis ×1/2              23.732                 30.736            120.0  112              0.157       0.890       0.946
+dosis ×1/4              47.803                 52.239             60.0  112              0.167       0.864       0.857
+dosis ×1/10            111.196                113.309             24.0  112              0.215       0.823       0.759
+dosis ×1/20            244.264                245.108             12.0  112              0.275       0.764       0.589
+JPEG q50                16.514                    NaN              NaN  112              0.140       0.890       0.964
+JPEG q25                23.974                    NaN              NaN  112              0.134       0.886       0.938
+
+== b. Reproducibilidad (CCC de Lin vs original; ≥ 0,9 robusta, < 0,7 frágil) ==
+                                    dosis ×1/2  dosis ×1/4  dosis ×1/10  dosis ×1/20  JPEG q50  JPEG q25
+medida                                                                                                  
+hu_media                                  1.00        0.99         0.94         0.81      0.60      0.57
+hu_desvio                                 1.00        0.99         0.89         0.66      0.37      0.36
+glcm_cluster_shade                        0.97        0.96         0.88         0.75      0.98      0.93
+frac_calcio                               1.00        0.97         0.87         0.65      0.98      0.97
+glcm_energia                              0.98        0.93         0.84         0.74      0.92      0.88
+nitidez_borde_hu_mm                       1.00        0.99         0.82         0.58      0.74      0.72
+excentricidad                             0.97        0.93         0.76         0.57      0.97      0.97
+glcm_cluster_prominence                   0.96        0.93         0.75         0.51      0.98      0.94
+glcm_entropia                             0.96        0.87         0.68         0.54      0.87      0.82
+frac_contacto_no_pulmon                   0.99        0.92         0.66         0.43      0.99      0.99
+glcm_homogeneidad                         0.96        0.86         0.64         0.51      0.92      0.87
+glcm_correlacion                          0.95        0.78         0.63         0.43      0.97      0.94
+hu_asimetria                              0.98        0.87         0.61         0.28      0.69      0.69
+frac_fina                                 0.96        0.68         0.60         0.38      0.94      0.95
+hu_curtosis                               0.97        0.84         0.57         0.28      0.80      0.79
+anillo_ext_glcm_correlacion               0.86        0.72         0.55         0.42      0.98      0.93
+anillo_int_hu_media                       0.99        0.93         0.52         0.31      1.00      0.99
+circularidad                              0.96        0.80         0.50         0.31      0.95      0.95
+anillo_ext_glcm_cluster_shade             0.98        0.54         0.49         0.37      0.99      0.99
+anillo_int_glcm_correlacion               0.88        0.70         0.49         0.35      0.97      0.93
+diametro_eq_mm                            1.00        0.81         0.47         0.34      1.00      1.00
+n_estructuras_convergentes                0.84        0.48         0.46         0.30      0.71      0.76
+anillo_ext_hu_media                       0.99        0.91         0.43         0.31      1.00      0.99
+solidez                                   0.94        0.73         0.43         0.29      0.95      0.93
+circularidad_cruda                        0.97        0.70         0.42         0.22      0.97      0.97
+anillo_int_glcm_energia                   0.87        0.65         0.42         0.24      0.94      0.83
+solidez_cruda                             0.95        0.59         0.36         0.16      0.94      0.95
+glcm_contraste                            0.96        0.70         0.34         0.12      0.98      0.96
+anillo_int_glcm_entropia                  0.85        0.56         0.32         0.16      0.96      0.88
+anillo_ext_glcm_cluster_prominence        0.98        0.47         0.31         0.18      0.99      0.99
+anillo_int_glcm_homogeneidad              0.78        0.50         0.29         0.15      0.94      0.85
+anillo_ext_glcm_entropia                  0.84        0.57         0.28         0.16      0.98      0.95
+anillo_int_frac_denso                     0.89        0.56         0.27         0.14      0.95      0.72
+anillo_ext_glcm_homogeneidad              0.78        0.53         0.27         0.15      0.98      0.93
+anillo_ext_glcm_energia                   0.83        0.53         0.25         0.16      0.96      0.89
+anillo_int_glcm_cluster_shade             0.84        0.47         0.20         0.05      0.98      0.93
+convergentes_por_10mm_borde               0.71        0.25         0.16         0.07      0.60      0.42
+area_mm2                                  1.00        0.61         0.15         0.09      1.00      1.00
+anillo_ext_hu_desvio                      0.92        0.51         0.14         0.07      0.99      0.98
+anillo_ext_frac_denso                     0.93        0.43         0.11         0.05      0.96      0.92
+anillo_int_hu_desvio                      0.87        0.41         0.11         0.04      0.98      0.95
+anillo_int_glcm_cluster_prominence        0.84        0.33         0.10         0.03      0.98      0.94
+anillo_int_glcm_contraste                 0.73        0.20         0.08         0.05      0.98      0.95
+anillo_ext_glcm_contraste                 0.70        0.21         0.07         0.03      0.99      0.97
+esqueleto_mm_por_mm_borde                 0.85        0.31         0.03        -0.00      0.86      0.67
+frac_aire                                 1.00        0.00        -0.00         0.00      1.00      0.77
+
+== c. AUC (validación cruzada por paciente) ==
+   re-armado = armado y evaluado con esa dosis; transferido = armado con la original
+TRANSFERIDO      diámetro solo  interior  interior + entorno  interior sin tamaño
+condicion                                                                    
+original             0.846     0.938               0.938                0.905
+dosis ×1/2           0.844     0.913               0.913                0.891
+dosis ×1/4           0.828     0.879               0.879                0.843
+dosis ×1/10          0.785     0.750               0.750                0.742
+dosis ×1/20          0.789     0.704               0.704                0.658
+JPEG q50             0.843     0.922               0.922                0.896
+JPEG q25             0.840     0.908               0.908                0.881
+RE-ARMADO      diámetro solo  interior  interior + entorno  interior sin tamaño
+condicion                                                                    
+original             0.846     0.938               0.938                0.905
+dosis ×1/2           0.844     0.888               0.888                0.866
+dosis ×1/4           0.830     0.886               0.886                0.842
+dosis ×1/10          0.783     0.827               0.799                0.808
+dosis ×1/20          0.788     0.742               0.732                0.721
+JPEG q50             0.843     0.893               0.893                0.885
+JPEG q25             0.840     0.862               0.862                0.843
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/07_baja_dosis.png
+
+[07 con anclaje por corriente × Φ: OK, 6.7 min]
+
+======================================================================
+07 con anclaje por ruido
+  python scripts/07_baja_dosis.py --anclaje ruido
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Simulando 217 nódulos × 7 condiciones (T = -475 HU, cierre 20 mm) con 7 procesos...
+  constante del tubo: 07a (calibrado con LIDC); ruido electrónico: sí
+  20/217
+  40/217
+  60/217
+  80/217
+  100/217
+  120/217
+  140/217
+  160/217
+  180/217
+  200/217
+  217/217
+
+Población: 112 nódulos de entrenamiento {'benigno': 56, 'sospechoso': 56}
+
+== a. Segmentación en cada condición ==
+             ruido_agregado_hu  ruido_total_pulmon_hu  mas_equivalente    n  frac_calcio_media  dice_medio  aceptables
+condicion                                                                                                             
+original                 0.000                 15.665            240.0  112              0.153       0.892       1.000
+dosis ×1/2              15.664                 22.124            120.0  112              0.154       0.892       0.991
+dosis ×1/4              27.201                 31.369             60.0  112              0.155       0.890       0.946
+dosis ×1/10             47.407                 49.916             24.0  112              0.162       0.881       0.911
+dosis ×1/20             69.684                 71.415             12.0  112              0.175       0.867       0.848
+JPEG q50                16.514                    NaN              NaN  112              0.140       0.890       0.964
+JPEG q25                23.974                    NaN              NaN  112              0.134       0.886       0.938
+
+== b. Reproducibilidad (CCC de Lin vs original; ≥ 0,9 robusta, < 0,7 frágil) ==
+                                    dosis ×1/2  dosis ×1/4  dosis ×1/10  dosis ×1/20  JPEG q50  JPEG q25
+medida                                                                                                  
+area_mm2                                  1.00        1.00         1.00         0.21      1.00      1.00
+diametro_eq_mm                            1.00        1.00         1.00         0.64      1.00      1.00
+hu_media                                  1.00        1.00         1.00         0.99      0.60      0.57
+hu_desvio                                 1.00        1.00         1.00         0.99      0.37      0.36
+nitidez_borde_hu_mm                       1.00        1.00         0.99         0.99      0.74      0.72
+frac_calcio                               1.00        1.00         0.99         0.97      0.98      0.97
+frac_contacto_no_pulmon                   0.99        0.99         0.98         0.86      0.99      0.99
+anillo_ext_hu_media                       1.00        0.99         0.97         0.93      1.00      0.99
+anillo_int_hu_media                       0.99        0.99         0.97         0.91      1.00      0.99
+circularidad                              0.97        0.96         0.95         0.89      0.95      0.95
+glcm_cluster_shade                        0.99        0.97         0.95         0.95      0.98      0.93
+glcm_cluster_prominence                   0.98        0.97         0.95         0.92      0.98      0.94
+solidez                                   0.97        0.94         0.94         0.86      0.95      0.93
+anillo_ext_glcm_cluster_shade             0.99        0.98         0.93         0.91      0.99      0.99
+anillo_ext_glcm_cluster_prominence        0.99        0.99         0.93         0.89      0.99      0.99
+excentricidad                             0.97        0.94         0.93         0.90      0.97      0.97
+glcm_energia                              0.98        0.97         0.92         0.89      0.92      0.88
+glcm_correlacion                          0.98        0.95         0.88         0.75      0.97      0.94
+hu_curtosis                               0.99        0.96         0.88         0.69      0.80      0.79
+hu_asimetria                              0.99        0.97         0.88         0.79      0.69      0.69
+glcm_entropia                             0.97        0.95         0.87         0.79      0.87      0.82
+frac_fina                                 0.95        0.97         0.86         0.82      0.94      0.95
+glcm_contraste                            0.99        0.98         0.86         0.65      0.98      0.96
+glcm_homogeneidad                         0.98        0.95         0.84         0.74      0.92      0.87
+anillo_ext_frac_denso                     0.97        0.91         0.83         0.56      0.96      0.92
+circularidad_cruda                        0.95        0.96         0.83         0.80      0.97      0.97
+solidez_cruda                             0.94        0.94         0.81         0.79      0.94      0.95
+anillo_ext_hu_desvio                      0.98        0.95         0.81         0.59      0.99      0.98
+anillo_int_glcm_cluster_shade             0.89        0.96         0.80         0.66      0.98      0.93
+frac_aire                                 1.00        1.00         0.79         0.02      1.00      0.77
+anillo_int_glcm_correlacion               0.95        0.91         0.77         0.65      0.97      0.93
+n_estructuras_convergentes                0.87        0.77         0.75         0.59      0.71      0.76
+anillo_int_hu_desvio                      0.95        0.93         0.75         0.51      0.98      0.95
+anillo_ext_glcm_correlacion               0.96        0.90         0.74         0.64      0.98      0.93
+anillo_int_glcm_cluster_prominence        0.90        0.97         0.73         0.52      0.98      0.94
+anillo_int_frac_denso                     0.94        0.76         0.71         0.55      0.95      0.72
+anillo_int_glcm_entropia                  0.93        0.86         0.65         0.47      0.96      0.88
+anillo_int_glcm_energia                   0.93        0.86         0.63         0.48      0.94      0.83
+esqueleto_mm_por_mm_borde                 0.79        0.74         0.63         0.24      0.86      0.67
+anillo_ext_glcm_entropia                  0.95        0.85         0.63         0.44      0.98      0.95
+convergentes_por_10mm_borde               0.62        0.53         0.61         0.26      0.60      0.42
+anillo_int_glcm_homogeneidad              0.91        0.80         0.59         0.43      0.94      0.85
+anillo_ext_glcm_homogeneidad              0.93        0.80         0.56         0.39      0.98      0.93
+anillo_ext_glcm_energia                   0.93        0.80         0.52         0.34      0.96      0.89
+anillo_int_glcm_contraste                 0.94        0.84         0.52         0.28      0.98      0.95
+anillo_ext_glcm_contraste                 0.96        0.81         0.46         0.24      0.99      0.97
+
+== c. AUC (validación cruzada por paciente) ==
+   re-armado = armado y evaluado con esa dosis; transferido = armado con la original
+TRANSFERIDO      diámetro solo  interior  interior + entorno  interior sin tamaño
+condicion                                                                    
+original             0.846     0.938               0.938                0.905
+dosis ×1/2           0.842     0.934               0.934                0.911
+dosis ×1/4           0.839     0.908               0.908                0.885
+dosis ×1/10          0.840     0.862               0.862                0.839
+dosis ×1/20          0.823     0.819               0.819                0.823
+JPEG q50             0.843     0.922               0.922                0.896
+JPEG q25             0.840     0.908               0.908                0.881
+RE-ARMADO      diámetro solo  interior  interior + entorno  interior sin tamaño
+condicion                                                                    
+original             0.846     0.938               0.938                0.905
+dosis ×1/2           0.843     0.934               0.934                0.910
+dosis ×1/4           0.838     0.901               0.911                0.866
+dosis ×1/10          0.838     0.857               0.850                0.827
+dosis ×1/20          0.826     0.870               0.870                0.835
+JPEG q50             0.843     0.893               0.893                0.885
+JPEG q25             0.840     0.862               0.862                0.843
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/07_baja_dosis_anclaje_ruido.png
+
+[07 con anclaje por ruido: OK, 8.2 min]
+
+======================================================================
+07 con anclaje híbrido
+  python scripts/07_baja_dosis.py --anclaje hibrido
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Simulando 217 nódulos × 7 condiciones (T = -475 HU, cierre 20 mm) con 7 procesos...
+  constante del tubo: 07a (calibrado con LIDC); ruido electrónico: sí
+  20/217
+  40/217
+  60/217
+  80/217
+  100/217
+  120/217
+  140/217
+  160/217
+  180/217
+  200/217
+  217/217
+
+Población: 112 nódulos de entrenamiento {'benigno': 56, 'sospechoso': 56}
+
+== a. Segmentación en cada condición ==
+             ruido_agregado_hu  ruido_total_pulmon_hu  mas_equivalente    n  frac_calcio_media  dice_medio  aceptables
+condicion                                                                                                             
+original                 0.000                 16.939            240.0  112              0.153       0.892       1.000
+dosis ×1/2              19.273                 25.515            120.0  112              0.155       0.889       0.955
+dosis ×1/4              38.844                 42.092             60.0  112              0.164       0.878       0.893
+dosis ×1/10             96.835                 98.436             24.0  112              0.193       0.845       0.741
+dosis ×1/20            183.688                184.420             12.0  112              0.261       0.780       0.562
+JPEG q50                16.514                    NaN              NaN  112              0.140       0.890       0.964
+JPEG q25                23.974                    NaN              NaN  112              0.134       0.886       0.938
+
+== b. Reproducibilidad (CCC de Lin vs original; ≥ 0,9 robusta, < 0,7 frágil) ==
+                                    dosis ×1/2  dosis ×1/4  dosis ×1/10  dosis ×1/20  JPEG q50  JPEG q25
+medida                                                                                                  
+hu_media                                  1.00        0.99         0.96         0.88      0.60      0.57
+hu_desvio                                 1.00        0.99         0.93         0.78      0.37      0.36
+frac_calcio                               1.00        0.99         0.91         0.73      0.98      0.97
+nitidez_borde_hu_mm                       1.00        0.98         0.89         0.71      0.74      0.72
+glcm_cluster_shade                        0.98        0.96         0.85         0.75      0.98      0.93
+glcm_energia                              0.98        0.94         0.85         0.77      0.92      0.88
+frac_contacto_no_pulmon                   1.00        0.91         0.84         0.64      0.99      0.99
+glcm_cluster_prominence                   0.97        0.93         0.75         0.48      0.98      0.94
+glcm_entropia                             0.97        0.88         0.71         0.56      0.87      0.82
+anillo_int_hu_media                       0.99        0.92         0.71         0.26      1.00      0.99
+excentricidad                             0.99        0.94         0.70         0.55      0.97      0.97
+glcm_correlacion                          0.97        0.91         0.68         0.53      0.97      0.94
+glcm_homogeneidad                         0.97        0.86         0.67         0.54      0.92      0.87
+diametro_eq_mm                            1.00        0.83         0.67         0.46      1.00      1.00
+anillo_ext_hu_media                       0.99        0.95         0.66         0.30      1.00      0.99
+anillo_ext_glcm_cluster_shade             0.98        0.92         0.65         0.33      0.99      0.99
+frac_fina                                 0.97        0.87         0.60         0.30      0.94      0.95
+hu_asimetria                              0.98        0.92         0.59         0.25      0.69      0.69
+anillo_ext_glcm_correlacion               0.94        0.81         0.57         0.45      0.98      0.93
+hu_curtosis                               0.99        0.87         0.56         0.42      0.80      0.79
+anillo_int_glcm_correlacion               0.93        0.77         0.54         0.38      0.97      0.93
+solidez                                   0.99        0.88         0.54         0.29      0.95      0.93
+circularidad                              0.99        0.85         0.53         0.31      0.95      0.95
+anillo_ext_glcm_cluster_prominence        0.98        0.89         0.49         0.17      0.99      0.99
+anillo_int_glcm_energia                   0.91        0.72         0.47         0.29      0.94      0.83
+glcm_contraste                            0.98        0.87         0.42         0.17      0.98      0.96
+circularidad_cruda                        0.95        0.79         0.42         0.25      0.97      0.97
+solidez_cruda                             0.96        0.78         0.41         0.23      0.94      0.95
+n_estructuras_convergentes                0.77        0.63         0.40         0.29      0.71      0.76
+anillo_ext_glcm_entropia                  0.90        0.68         0.38         0.23      0.98      0.95
+anillo_int_glcm_entropia                  0.90        0.70         0.37         0.21      0.96      0.88
+anillo_ext_glcm_homogeneidad              0.86        0.63         0.35         0.22      0.98      0.93
+anillo_int_glcm_homogeneidad              0.86        0.64         0.34         0.21      0.94      0.85
+anillo_int_frac_denso                     0.91        0.81         0.33         0.13      0.95      0.72
+anillo_ext_glcm_energia                   0.88        0.62         0.33         0.25      0.96      0.89
+anillo_ext_hu_desvio                      0.95        0.77         0.31         0.11      0.99      0.98
+area_mm2                                  1.00        0.61         0.25         0.13      1.00      1.00
+convergentes_por_10mm_borde               0.42        0.32         0.25         0.13      0.60      0.42
+anillo_ext_frac_denso                     0.93        0.69         0.24         0.08      0.96      0.92
+anillo_int_glcm_cluster_shade             0.95        0.58         0.19         0.04      0.98      0.93
+anillo_int_hu_desvio                      0.89        0.69         0.17         0.09      0.98      0.95
+esqueleto_mm_por_mm_borde                 0.72        0.57         0.15         0.02      0.86      0.67
+anillo_int_glcm_contraste                 0.81        0.52         0.13         0.07      0.98      0.95
+anillo_ext_glcm_contraste                 0.82        0.44         0.11         0.06      0.99      0.97
+anillo_int_glcm_cluster_prominence        0.93        0.53         0.09         0.06      0.98      0.94
+frac_aire                                 1.00        0.00         0.00         0.00      1.00      0.77
+
+== c. AUC (validación cruzada por paciente) ==
+   re-armado = armado y evaluado con esa dosis; transferido = armado con la original
+TRANSFERIDO      diámetro solo  interior  interior + entorno  interior sin tamaño
+condicion                                                                    
+original             0.846     0.938               0.938                0.905
+dosis ×1/2           0.844     0.933               0.933                0.904
+dosis ×1/4           0.823     0.879               0.879                0.869
+dosis ×1/10          0.793     0.758               0.758                0.751
+dosis ×1/20          0.764     0.710               0.710                0.664
+JPEG q50             0.843     0.922               0.922                0.896
+JPEG q25             0.840     0.908               0.908                0.881
+RE-ARMADO      diámetro solo  interior  interior + entorno  interior sin tamaño
+condicion                                                                    
+original             0.846     0.938               0.938                0.905
+dosis ×1/2           0.844     0.911               0.911                0.903
+dosis ×1/4           0.825     0.856               0.856                0.851
+dosis ×1/10          0.795     0.784               0.783                0.746
+dosis ×1/20          0.768     0.721               0.722                0.702
+JPEG q50             0.843     0.893               0.893                0.885
+JPEG q25             0.840     0.862               0.862                0.843
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/07_baja_dosis_anclaje_hibrido.png
+
+[07 con anclaje híbrido: OK, 9.2 min]
+
+======================================================================
+Comparación de anclajes
+  python comparaciones/comparar_anclajes.py
+======================================================================
+
+################ mAs vs ruido ################
+== Ruido agregado (pulmón): anclaje por mAs / ruido ==
+             count   10%   50%   90%
+condicion                           
+dosis ×1/10  217.0  1.27  2.30  4.27
+dosis ×1/2   217.0  0.99  1.54  2.27
+dosis ×1/20  217.0  1.54  3.01  5.30
+dosis ×1/4   217.0  1.08  1.76  3.00
+
+== CCC: diferencia (mAs - ruido) por condición ==
+      dosis ×1/2  dosis ×1/4  dosis ×1/10  dosis ×1/20
+mean       0.044       0.262        0.379        0.368
+max        0.262       0.999        0.847        0.709
+   dosis ×1/2: medidas que cambian de 'robusta' (CCC ≥ 0,9) a no, o al revés: anillo_ext_glcm_contraste, anillo_ext_glcm_correlacion, anillo_ext_glcm_energia, anillo_ext_glcm_entropia, anillo_ext_glcm_homogeneidad, anillo_int_frac_denso, anillo_int_glcm_contraste, anillo_int_glcm_correlacion, anillo_int_glcm_energia, anillo_int_glcm_entropia, anillo_int_glcm_homogeneidad, anillo_int_hu_desvio
+   dosis ×1/4: medidas que cambian de 'robusta' (CCC ≥ 0,9) a no, o al revés: anillo_ext_frac_denso, anillo_ext_glcm_cluster_prominence, anillo_ext_glcm_cluster_shade, anillo_ext_hu_desvio, anillo_int_glcm_cluster_prominence, anillo_int_glcm_cluster_shade, anillo_int_glcm_correlacion, anillo_int_hu_desvio, area_mm2, circularidad, circularidad_cruda, diametro_eq_mm, frac_aire, frac_fina, glcm_contraste, glcm_correlacion, glcm_entropia, glcm_homogeneidad, hu_asimetria, hu_curtosis, solidez, solidez_cruda
+   dosis ×1/10: medidas que cambian de 'robusta' (CCC ≥ 0,9) a no, o al revés: anillo_ext_glcm_cluster_prominence, anillo_ext_glcm_cluster_shade, anillo_ext_hu_media, anillo_int_hu_media, area_mm2, circularidad, diametro_eq_mm, excentricidad, frac_calcio, frac_contacto_no_pulmon, glcm_cluster_prominence, glcm_cluster_shade, glcm_energia, hu_desvio, nitidez_borde_hu_mm, solidez
+   dosis ×1/20: medidas que cambian de 'robusta' (CCC ≥ 0,9) a no, o al revés: anillo_ext_glcm_cluster_shade, anillo_ext_hu_media, anillo_int_hu_media, excentricidad, frac_calcio, glcm_cluster_prominence, glcm_cluster_shade, hu_desvio, hu_media, nitidez_borde_hu_mm
+
+== AUC transferido: mAs vs ruido ==
+  condicion             puntaje  auc_transferido_mas  auc_transferido_alt  dif_auc_transferido
+   original       diámetro solo                0.846                0.846                0.000
+   original interior sin tamaño                0.905                0.905                0.000
+   original            interior                0.938                0.938                0.000
+   original  interior + entorno                0.938                0.938                0.000
+ dosis ×1/2       diámetro solo                0.844                0.842                0.001
+ dosis ×1/2 interior sin tamaño                0.891                0.911               -0.020
+ dosis ×1/2            interior                0.913                0.934               -0.020
+ dosis ×1/2  interior + entorno                0.913                0.934               -0.020
+ dosis ×1/4       diámetro solo                0.828                0.839               -0.010
+ dosis ×1/4 interior sin tamaño                0.843                0.885               -0.042
+ dosis ×1/4            interior                0.879                0.908               -0.029
+ dosis ×1/4  interior + entorno                0.879                0.908               -0.029
+dosis ×1/10       diámetro solo                0.785                0.840               -0.055
+dosis ×1/10 interior sin tamaño                0.742                0.839               -0.097
+dosis ×1/10            interior                0.750                0.862               -0.112
+dosis ×1/10  interior + entorno                0.750                0.862               -0.112
+dosis ×1/20       diámetro solo                0.789                0.823               -0.034
+dosis ×1/20 interior sin tamaño                0.658                0.823               -0.165
+dosis ×1/20            interior                0.704                0.819               -0.115
+dosis ×1/20  interior + entorno                0.704                0.819               -0.115
+   JPEG q50       diámetro solo                0.843                0.843                0.000
+   JPEG q50 interior sin tamaño                0.896                0.896                0.000
+   JPEG q50            interior                0.922                0.922                0.000
+   JPEG q50  interior + entorno                0.922                0.922                0.000
+   JPEG q25       diámetro solo                0.840                0.840                0.000
+   JPEG q25 interior sin tamaño                0.881                0.881                0.000
+   JPEG q25            interior                0.908                0.908                0.000
+   JPEG q25  interior + entorno                0.908                0.908                0.000
+
+Máxima diferencia de AUC: 0.165 (compararla con el ancho del IC 95 % por bootstrap del 07)
+
+################ mAs vs hibrido ################
+== Ruido agregado (pulmón): anclaje por mAs / hibrido ==
+             count   10%   50%   90%
+condicion                           
+dosis ×1/10  217.0  0.73  1.32  2.11
+dosis ×1/2   217.0  0.78  1.26  1.77
+dosis ×1/20  217.0  0.71  1.34  2.23
+dosis ×1/4   217.0  0.75  1.27  1.88
+
+== CCC: diferencia (mAs - hibrido) por condición ==
+      dosis ×1/2  dosis ×1/4  dosis ×1/10  dosis ×1/20
+mean       0.037       0.113         0.07        0.049
+max        0.287       0.421         0.23        0.215
+   dosis ×1/2: medidas que cambian de 'robusta' (CCC ≥ 0,9) a no, o al revés: anillo_ext_glcm_correlacion, anillo_int_frac_denso, anillo_int_glcm_cluster_prominence, anillo_int_glcm_cluster_shade, anillo_int_glcm_correlacion, anillo_int_glcm_energia
+   dosis ×1/4: medidas que cambian de 'robusta' (CCC ≥ 0,9) a no, o al revés: anillo_ext_glcm_cluster_shade, glcm_correlacion, hu_asimetria
+   dosis ×1/10: medidas que cambian de 'robusta' (CCC ≥ 0,9) a no, o al revés: frac_calcio, hu_desvio
+   dosis ×1/20: medidas que cambian de 'robusta' (CCC ≥ 0,9) a no, o al revés: ninguna
+
+== AUC transferido: mAs vs hibrido ==
+  condicion             puntaje  auc_transferido_mas  auc_transferido_alt  dif_auc_transferido
+   original       diámetro solo                0.846                0.846                0.000
+   original interior sin tamaño                0.905                0.905                0.000
+   original            interior                0.938                0.938                0.000
+   original  interior + entorno                0.938                0.938                0.000
+ dosis ×1/2       diámetro solo                0.844                0.844                0.000
+ dosis ×1/2 interior sin tamaño                0.891                0.904               -0.013
+ dosis ×1/2            interior                0.913                0.933               -0.019
+ dosis ×1/2  interior + entorno                0.913                0.933               -0.019
+ dosis ×1/4       diámetro solo                0.828                0.823                0.005
+ dosis ×1/4 interior sin tamaño                0.843                0.869               -0.026
+ dosis ×1/4            interior                0.879                0.879               -0.001
+ dosis ×1/4  interior + entorno                0.879                0.879               -0.001
+dosis ×1/10       diámetro solo                0.785                0.793               -0.008
+dosis ×1/10 interior sin tamaño                0.742                0.751               -0.009
+dosis ×1/10            interior                0.750                0.758               -0.008
+dosis ×1/10  interior + entorno                0.750                0.758               -0.008
+dosis ×1/20       diámetro solo                0.789                0.764                0.025
+dosis ×1/20 interior sin tamaño                0.658                0.664               -0.005
+dosis ×1/20            interior                0.704                0.710               -0.005
+dosis ×1/20  interior + entorno                0.704                0.710               -0.005
+   JPEG q50       diámetro solo                0.843                0.843                0.000
+   JPEG q50 interior sin tamaño                0.896                0.896                0.000
+   JPEG q50            interior                0.922                0.922                0.000
+   JPEG q50  interior + entorno                0.922                0.922                0.000
+   JPEG q25       diámetro solo                0.840                0.840                0.000
+   JPEG q25 interior sin tamaño                0.881                0.881                0.000
+   JPEG q25            interior                0.908                0.908                0.000
+   JPEG q25  interior + entorno                0.908                0.908                0.000
+
+Máxima diferencia de AUC: 0.026 (compararla con el ancho del IC 95 % por bootstrap del 07)
+
+[Comparación de anclajes: OK, 0.0 min]
+
+======================================================================
+08 propuesta (anclaje mas)
+  python scripts/08_propuesta.py --anclaje mas
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: mas (lee resultados/07_baja_dosis.csv)
+
+################ TODOS: 112 nódulos {'benigno': 56, 'sospechoso': 56} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                 medida  ruido_tolerable_hu  CCC dosis ×1/4  ICC dosis ×1/4  CCC dosis ×1/10
+               hu_media              111.20            0.99            0.99             0.94
+    nitidez_borde_hu_mm               47.80            0.99            0.99             0.82
+     glcm_cluster_shade               47.80            0.96            0.96             0.88
+           glcm_energia               47.80            0.93            0.93             0.84
+glcm_cluster_prominence               47.80            0.93            0.93             0.75
+            frac_calcio               47.80            0.97            0.97             0.87
+    anillo_int_hu_media               47.80            0.93            0.93             0.52
+              hu_desvio               47.80            0.99            0.99             0.89
+frac_contacto_no_pulmon               47.80            0.92            0.92             0.66
+    anillo_ext_hu_media               47.80            0.91            0.91             0.43
+          excentricidad               47.80            0.93            0.93             0.76
+      glcm_homogeneidad               23.73            0.86            0.86             0.64
+         diametro_eq_mm               23.73            0.81            0.82             0.47
+   anillo_ext_hu_desvio               23.73            0.51            0.51             0.14
+  anillo_ext_frac_denso               23.73            0.43            0.43             0.11
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/4 (y AUC >= 0.7 al armar) ==
+    excentricidad, nitidez_borde_hu_mm, hu_media, hu_desvio, frac_calcio, glcm_energia, glcm_cluster_shade, glcm_cluster_prominence
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.846                     0.938                         0.764
+dosis ×1/2           0.844                     0.913                         0.770
+dosis ×1/4           0.828                     0.879                         0.768
+dosis ×1/10          0.785                     0.750                         0.719
+dosis ×1/20          0.789                     0.704                         0.665
+
+################ SIN CALCIO: 71 nódulos {'sospechoso': 49, 'benigno': 22} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                       medida  ruido_tolerable_hu  CCC dosis ×1/4  ICC dosis ×1/4  CCC dosis ×1/10
+          nitidez_borde_hu_mm               41.90            0.90            0.90             0.26
+          anillo_ext_hu_media               41.90            0.93            0.93             0.61
+                 circularidad               41.90            0.91            0.91             0.56
+                excentricidad               41.90            0.94            0.94             0.73
+          anillo_int_hu_media               41.90            0.93            0.93             0.43
+                  hu_curtosis               41.90            0.92            0.92             0.65
+                     hu_media               41.90            0.94            0.94             0.46
+           glcm_cluster_shade               20.61            0.83            0.83             0.59
+               diametro_eq_mm               20.61            0.77            0.78             0.58
+  anillo_int_glcm_correlacion               20.61            0.75            0.76             0.55
+                     area_mm2               20.61            0.54            0.54             0.31
+            glcm_homogeneidad               20.61            0.75            0.75             0.38
+         anillo_ext_hu_desvio               20.61            0.51            0.52             0.18
+        anillo_ext_frac_denso               20.61            0.52            0.52             0.14
+anillo_ext_glcm_cluster_shade               20.61            0.35            0.35             0.39
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/4 (y AUC >= 0.7 al armar) ==
+    circularidad, excentricidad, nitidez_borde_hu_mm, hu_media, hu_curtosis
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.936                     0.919                         0.731
+dosis ×1/2           0.936                     0.857                         0.753
+dosis ×1/4           0.926                     0.857                         0.752
+dosis ×1/10          0.868                     0.807                         0.749
+dosis ×1/20          0.921                     0.814                         0.759
+
+== 3. Calcio robusto al ruido ==
+condicion                                              original dosis ×1/2 dosis ×1/4 dosis ×1/10 dosis ×1/20
+sin calcio: calcio falso medio (umbral simple)         0.000122    0.00382   0.016671    0.068097     0.15506
+sin calcio: calcio falso medio (robusto)                    0.0        0.0   0.003796     0.03411    0.100242
+sin calcio: % que parece calcificado (umbral simple)        0.0   4.225352  12.676056   43.661972    60.56338
+sin calcio: % que parece calcificado (robusto)              0.0        0.0   4.225352    19.71831    39.43662
+calcificados: % detectado (umbral simple)                 100.0      100.0      100.0       100.0       100.0
+calcificados: % detectado (robusto)                   90.243902  87.804878  90.243902   95.121951   97.560976
+n sin / con calcio                                      71 / 41    71 / 41    71 / 41     71 / 41     71 / 41
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta.png
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_sincalcio.png
+
+[08 propuesta (anclaje mas): OK, 0.2 min]
+
+======================================================================
+08 propuesta (anclaje ruido)
+  python scripts/08_propuesta.py --anclaje ruido
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: ruido (lee resultados/07_baja_dosis_anclaje_ruido.csv)
+
+################ TODOS: 112 nódulos {'benigno': 56, 'sospechoso': 56} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                            medida  ruido_tolerable_hu  CCC dosis ×1/4  ICC dosis ×1/4  CCC dosis ×1/10
+     anillo_ext_glcm_cluster_shade               69.68            0.98            0.98             0.93
+                     excentricidad               69.68            0.94            0.94             0.93
+               anillo_ext_hu_media               69.68            0.99            0.99             0.97
+               anillo_int_hu_media               69.68            0.99            0.99             0.97
+               nitidez_borde_hu_mm               69.68            1.00            1.00             0.99
+                          hu_media               69.68            1.00            1.00             1.00
+                         hu_desvio               69.68            1.00            1.00             1.00
+           glcm_cluster_prominence               69.68            0.97            0.97             0.95
+                glcm_cluster_shade               69.68            0.97            0.97             0.95
+                       frac_calcio               69.68            1.00            1.00             0.99
+                          area_mm2               47.41            1.00            1.00             1.00
+                      glcm_energia               47.41            0.97            0.97             0.92
+anillo_ext_glcm_cluster_prominence               47.41            0.99            0.99             0.93
+                    diametro_eq_mm               47.41            1.00            1.00             1.00
+           frac_contacto_no_pulmon               47.41            0.99            0.99             0.98
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/4 (y AUC >= 0.7 al armar) ==
+    area_mm2, diametro_eq_mm, circularidad, solidez, excentricidad, circularidad_cruda, solidez_cruda, frac_fina, nitidez_borde_hu_mm, hu_media, hu_desvio, hu_asimetria, hu_curtosis, frac_calcio, glcm_energia, glcm_entropia, glcm_contraste, glcm_homogeneidad, glcm_correlacion, glcm_cluster_shade, glcm_cluster_prominence
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.846                     0.938                         0.938
+dosis ×1/2           0.842                     0.934                         0.934
+dosis ×1/4           0.839                     0.908                         0.908
+dosis ×1/10          0.840                     0.862                         0.862
+dosis ×1/20          0.823                     0.819                         0.819
+
+################ SIN CALCIO: 71 nódulos {'sospechoso': 49, 'benigno': 22} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                            medida  ruido_tolerable_hu  CCC dosis ×1/4  ICC dosis ×1/4  CCC dosis ×1/10
+                          area_mm2               65.97            1.00            1.00             1.00
+               nitidez_borde_hu_mm               65.97            0.99            0.99             0.94
+               anillo_ext_hu_media               65.97            0.99            0.99             0.97
+                    diametro_eq_mm               65.97            1.00            1.00             1.00
+                          hu_media               65.97            0.99            0.99             0.96
+           frac_contacto_no_pulmon               65.97            1.00            1.00             0.99
+                     excentricidad               65.97            0.94            0.94             0.93
+                      circularidad               65.97            0.98            0.98             0.97
+                           solidez               65.97            0.98            0.98             0.97
+               anillo_int_hu_media               44.72            0.99            0.99             0.97
+                     solidez_cruda               25.85            0.98            0.98             0.82
+                  glcm_correlacion               25.85            0.94            0.94             0.86
+anillo_ext_glcm_cluster_prominence               25.85            0.96            0.96             0.79
+     anillo_ext_glcm_cluster_shade               25.85            0.96            0.96             0.83
+             anillo_ext_frac_denso               25.85            0.92            0.92             0.75
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/4 (y AUC >= 0.7 al armar) ==
+    area_mm2, diametro_eq_mm, circularidad, solidez, excentricidad, circularidad_cruda, solidez_cruda, frac_fina, nitidez_borde_hu_mm, hu_media, hu_desvio, hu_asimetria, hu_curtosis, glcm_contraste, glcm_homogeneidad, glcm_correlacion, glcm_cluster_shade, glcm_cluster_prominence
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.936                     0.919                         0.919
+dosis ×1/2           0.930                     0.904                         0.904
+dosis ×1/4           0.931                     0.898                         0.898
+dosis ×1/10          0.928                     0.887                         0.887
+dosis ×1/20          0.927                     0.847                         0.847
+
+== 3. Calcio robusto al ruido ==
+condicion                                              original dosis ×1/2 dosis ×1/4 dosis ×1/10 dosis ×1/20
+sin calcio: calcio falso medio (umbral simple)         0.000122    0.00044   0.002285    0.008358    0.020328
+sin calcio: calcio falso medio (robusto)                    0.0        0.0        0.0         0.0    0.001453
+sin calcio: % que parece calcificado (umbral simple)        0.0        0.0   4.225352   12.676056   22.535211
+sin calcio: % que parece calcificado (robusto)              0.0        0.0        0.0         0.0    4.225352
+calcificados: % detectado (umbral simple)                 100.0      100.0      100.0   97.560976       100.0
+calcificados: % detectado (robusto)                   90.243902  87.804878  90.243902   90.243902   95.121951
+n sin / con calcio                                      71 / 41    71 / 41    71 / 41     71 / 41     71 / 41
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_ruido.png
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_ruido_sincalcio.png
+
+[08 propuesta (anclaje ruido): OK, 0.2 min]
+
+======================================================================
+08 propuesta (anclaje hibrido)
+  python scripts/08_propuesta.py --anclaje hibrido
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: hibrido (lee resultados/07_baja_dosis_anclaje_hibrido.csv)
+
+################ TODOS: 112 nódulos {'benigno': 56, 'sospechoso': 56} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                       medida  ruido_tolerable_hu  CCC dosis ×1/4  ICC dosis ×1/4  CCC dosis ×1/10
+                     hu_media               96.83            0.99            0.99             0.96
+                  frac_calcio               96.83            0.99            0.99             0.91
+                    hu_desvio               96.83            0.99            0.99             0.93
+      frac_contacto_no_pulmon               38.84            0.91            0.91             0.84
+      glcm_cluster_prominence               38.84            0.93            0.93             0.75
+           glcm_cluster_shade               38.84            0.96            0.96             0.85
+             glcm_correlacion               38.84            0.91            0.91             0.68
+                 glcm_energia               38.84            0.94            0.94             0.85
+          anillo_ext_hu_media               38.84            0.95            0.95             0.66
+                 hu_asimetria               38.84            0.92            0.92             0.59
+          nitidez_borde_hu_mm               38.84            0.98            0.98             0.89
+                excentricidad               38.84            0.94            0.94             0.70
+anillo_ext_glcm_cluster_shade               38.84            0.92            0.92             0.65
+          anillo_int_hu_media               38.84            0.92            0.92             0.71
+        anillo_int_frac_denso               19.27            0.81            0.81             0.33
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/4 (y AUC >= 0.7 al armar) ==
+    excentricidad, nitidez_borde_hu_mm, hu_media, hu_desvio, hu_asimetria, frac_calcio, glcm_energia, glcm_correlacion, glcm_cluster_shade, glcm_cluster_prominence
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.846                     0.938                         0.925
+dosis ×1/2           0.844                     0.933                         0.918
+dosis ×1/4           0.823                     0.879                         0.883
+dosis ×1/10          0.793                     0.758                         0.803
+dosis ×1/20          0.764                     0.710                         0.731
+
+################ SIN CALCIO: 71 nódulos {'sospechoso': 49, 'benigno': 22} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                       medida  ruido_tolerable_hu  CCC dosis ×1/4  ICC dosis ×1/4  CCC dosis ×1/10
+                     area_mm2               96.15            1.00            1.00             1.00
+               diametro_eq_mm               96.15            1.00            1.00             0.99
+      frac_contacto_no_pulmon               96.15            1.00            1.00             0.98
+                      solidez               38.13            0.94            0.94             0.80
+                     hu_media               38.13            0.98            0.98             0.76
+             glcm_correlacion               38.13            0.90            0.90             0.67
+                excentricidad               38.13            0.93            0.93             0.71
+          anillo_ext_hu_media               38.13            0.98            0.98             0.85
+          anillo_int_hu_media               38.13            0.97            0.97             0.85
+                 circularidad               38.13            0.93            0.93             0.75
+          nitidez_borde_hu_mm               38.13            0.96            0.96             0.57
+                solidez_cruda               38.13            0.93            0.93             0.45
+           circularidad_cruda               38.13            0.94            0.94             0.49
+anillo_ext_glcm_cluster_shade               18.77            0.90            0.90             0.60
+  anillo_ext_glcm_correlacion               18.77            0.79            0.79             0.57
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/4 (y AUC >= 0.7 al armar) ==
+    area_mm2, diametro_eq_mm, circularidad, solidez, excentricidad, circularidad_cruda, solidez_cruda, nitidez_borde_hu_mm, hu_media, glcm_correlacion
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.936                     0.919                         0.898
+dosis ×1/2           0.930                     0.897                         0.896
+dosis ×1/4           0.928                     0.889                         0.914
+dosis ×1/10          0.911                     0.827                         0.871
+dosis ×1/20          0.887                     0.751                         0.847
+
+== 3. Calcio robusto al ruido ==
+condicion                                              original dosis ×1/2 dosis ×1/4 dosis ×1/10 dosis ×1/20
+sin calcio: calcio falso medio (umbral simple)         0.000122   0.000231   0.008864    0.042005     0.12194
+sin calcio: calcio falso medio (robusto)                    0.0        0.0    0.00272    0.018338    0.070679
+sin calcio: % que parece calcificado (umbral simple)        0.0        0.0  11.267606   32.394366   61.971831
+sin calcio: % que parece calcificado (robusto)              0.0        0.0   1.408451   14.084507   38.028169
+calcificados: % detectado (umbral simple)                 100.0  97.560976      100.0   97.560976       100.0
+calcificados: % detectado (robusto)                   90.243902  87.804878  92.682927   97.560976   97.560976
+n sin / con calcio                                      71 / 41    71 / 41    71 / 41     71 / 41     71 / 41
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_hibrido.png
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_hibrido_sincalcio.png
+
+[08 propuesta (anclaje hibrido): OK, 0.2 min]
+
+======================================================================
+Incertidumbre, anclaje por ruido, TODOS los nódulos
+  python comparaciones/incertidumbre_dosis.py --carpeta datos/cortes --anclaje ruido --casos todos --muestras 50
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+
+[1] LIDC-IDRI-0004_s15_n0 (GE/suave)
+
+[2] LIDC-IDRI-0067_s78_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±65.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±101.3 %
+
+[3] LIDC-IDRI-0294_s294_n1 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±55.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±81.5 %
+
+[4] LIDC-IDRI-0066_s77_n2 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±100.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±104.0 %
+
+[5] LIDC-IDRI-0486_s492_n0 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±76.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±145.6 %
+
+[6] LIDC-IDRI-0433_s437_n2 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±64.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±90.3 %
+
+[7] LIDC-IDRI-0119_s124_n0 (SIEMENS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±56.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±82.8 %
+
+[8] LIDC-IDRI-0409_s413_n0 (PHILIPS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±44.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±85.0 %
+
+[9] LIDC-IDRI-0084_s92_n1 (TOSHIBA/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±41.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±79.0 %
+
+[10] LIDC-IDRI-0011_s22_n5 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±42.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±88.2 %
+
+[11] LIDC-IDRI-0077_s87_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±36.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±90.5 %
+
+[12] LIDC-IDRI-0309_s309_n1 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±32.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±72.2 %
+
+[13] LIDC-IDRI-0298_s298_n2 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±31.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±75.3 %
+
+[14] LIDC-IDRI-0492_s498_n1 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±26.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±76.9 %
+
+[15] LIDC-IDRI-0583_s589_n13 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±28.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±79.2 %
+
+[16] LIDC-IDRI-0141_s144_n4 (SIEMENS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±26.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±66.8 %
+
+[17] LIDC-IDRI-0456_s461_n0 (PHILIPS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±25.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±58.2 %
+
+[18] LIDC-IDRI-0011_s22_n9 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±24.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±54.2 %
+
+[19] LIDC-IDRI-0087_s95_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±24.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±50.2 %
+
+[20] LIDC-IDRI-0318_s319_n0 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±22.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±50.0 %
+
+[21] LIDC-IDRI-0424_s428_n2 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±21.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±48.0 %
+
+[22] LIDC-IDRI-0562_s568_n1 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±19.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±47.7 %
+
+[23] LIDC-IDRI-0608_s613_n0 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±17.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±46.2 %
+
+[24] LIDC-IDRI-0358_s361_n5 (SIEMENS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±18.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±49.9 %
+
+[25] LIDC-IDRI-0794_s861_n0 (PHILIPS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±17.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±46.4 %
+
+[26] LIDC-IDRI-0018_s29_n3 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±18.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±42.3 %
+
+[27] LIDC-IDRI-0160_s161_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±20.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±41.2 %
+
+[28] LIDC-IDRI-0403_s407_n0 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±20.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±40.6 %
+
+[29] LIDC-IDRI-0445_s450_n1 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±19.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±40.3 %
+
+[30] LIDC-IDRI-0576_s582_n2 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±20.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±39.7 %
+
+[31] LIDC-IDRI-0608_s613_n1 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±17.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±39.6 %
+
+[32] LIDC-IDRI-0791_s864_n0 (SIEMENS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±19.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±38.8 %
+
+[33] LIDC-IDRI-0913_s742_n2 (PHILIPS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±18.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±35.0 %
+
+[34] LIDC-IDRI-0021_s32_n2 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±18.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±34.6 %
+
+[35] LIDC-IDRI-0160_s161_n1 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±18.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±36.6 %
+
+[36] LIDC-IDRI-0407_s411_n1 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±17.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±35.4 %
+
+[37] LIDC-IDRI-0481_s486_n0 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±16.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±35.0 %
+
+[38] LIDC-IDRI-0587_s592_n4 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±16.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±34.7 %
+
+[39] LIDC-IDRI-0617_s622_n1 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±16.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±34.1 %
+
+[40] LIDC-IDRI-0023_s34_n0 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±33.3 %
+
+[41] LIDC-IDRI-0163_s164_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±16.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±33.6 %
+
+[42] LIDC-IDRI-0420_s424_n0 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±31.1 %
+
+[43] LIDC-IDRI-0481_s486_n3 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±16.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±32.9 %
+
+[44] LIDC-IDRI-0601_s606_n4 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±18.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±33.2 %
+
+[45] LIDC-IDRI-0617_s622_n2 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±17.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±31.9 %
+
+[46] LIDC-IDRI-0024_s35_n2 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±16.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±31.8 %
+
+[47] LIDC-IDRI-0195_s196_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±28.6 %
+
+[48] LIDC-IDRI-0463_s468_n1 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±16.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±29.1 %
+
+[49] LIDC-IDRI-0481_s486_n6 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±28.6 %
+
+[50] LIDC-IDRI-0814_s841_n0 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±29.3 %
+
+[51] LIDC-IDRI-0835_s820_n1 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±28.2 %
+
+[52] LIDC-IDRI-0031_s42_n2 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±26.9 %
+
+[53] LIDC-IDRI-0195_s196_n1 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±25.2 %
+
+[54] LIDC-IDRI-0625_s630_n0 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±29.4 %
+
+[55] LIDC-IDRI-0775_s880_n2 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±26.5 %
+
+[56] LIDC-IDRI-0822_s833_n6 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±28.5 %
+
+[57] LIDC-IDRI-0912_s743_n0 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±14.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±26.7 %
+
+[58] LIDC-IDRI-0031_s42_n4 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±14.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±26.7 %
+
+[59] LIDC-IDRI-0195_s196_n2 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±14.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±26.6 %
+
+[60] LIDC-IDRI-0648_s1007_n2 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±14.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±26.7 %
+
+[61] LIDC-IDRI-0775_s880_n3 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±13.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±25.3 %
+
+[62] LIDC-IDRI-0942_s713_n1 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±14.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±24.9 %
+
+[63] LIDC-IDRI-0037_s48_n1 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±25.3 %
+
+[64] LIDC-IDRI-0195_s196_n6 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±24.2 %
+
+[65] LIDC-IDRI-0717_s938_n0 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±13.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±24.4 %
+
+[66] LIDC-IDRI-0776_s879_n0 (SIEMENS/intermedio)
+
+######################################################################
+# ETAPA: resto
+######################################################################
+
+======================================================================
+08 propuesta (anclaje mas, dosis de uso ×1/10)
+  python scripts/08_propuesta.py --anclaje mas --dosis-uso 10
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: mas (lee resultados/07_baja_dosis.csv)
+Dosis de uso para decidir qué es robusto: dosis ×1/10
+
+################ TODOS: 112 nódulos {'benigno': 56, 'sospechoso': 56} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                 medida  ruido_tolerable_hu  CCC dosis ×1/10  ICC dosis ×1/10
+               hu_media              111.20             0.94             0.94
+    nitidez_borde_hu_mm               47.80             0.82             0.82
+     glcm_cluster_shade               47.80             0.88             0.88
+           glcm_energia               47.80             0.84             0.84
+glcm_cluster_prominence               47.80             0.75             0.75
+            frac_calcio               47.80             0.87             0.87
+    anillo_int_hu_media               47.80             0.52             0.52
+              hu_desvio               47.80             0.89             0.89
+frac_contacto_no_pulmon               47.80             0.66             0.66
+    anillo_ext_hu_media               47.80             0.43             0.44
+          excentricidad               47.80             0.76             0.77
+      glcm_homogeneidad               23.73             0.64             0.64
+         diametro_eq_mm               23.73             0.47             0.47
+   anillo_ext_hu_desvio               23.73             0.14             0.14
+  anillo_ext_frac_denso               23.73             0.11             0.11
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/10 (y AUC >= 0.7 al armar) ==
+    hu_media
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.846                     0.938                         0.657
+dosis ×1/2           0.844                     0.913                         0.655
+dosis ×1/4           0.828                     0.879                         0.651
+dosis ×1/10          0.785                     0.750                         0.637
+dosis ×1/20          0.789                     0.704                         0.625
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.846 [0.77-0.92]        0.938 [0.89-0.97]            0.657 [0.54-0.76]
+dosis ×1/2   0.844 [0.77-0.92]        0.913 [0.85-0.96]            0.655 [0.54-0.76]
+dosis ×1/4   0.828 [0.75-0.90]        0.879 [0.80-0.94]            0.651 [0.54-0.76]
+dosis ×1/10  0.785 [0.69-0.87]        0.750 [0.64-0.85]            0.637 [0.53-0.75]
+dosis ×1/20  0.789 [0.70-0.87]        0.704 [0.60-0.81]            0.625 [0.51-0.73]
+
+################ SIN CALCIO: 71 nódulos {'sospechoso': 49, 'benigno': 22} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                       medida  ruido_tolerable_hu  CCC dosis ×1/10  ICC dosis ×1/10
+          nitidez_borde_hu_mm               41.90             0.26             0.26
+          anillo_ext_hu_media               41.90             0.61             0.62
+                 circularidad               41.90             0.56             0.56
+                excentricidad               41.90             0.73             0.73
+          anillo_int_hu_media               41.90             0.43             0.44
+                  hu_curtosis               41.90             0.65             0.65
+                     hu_media               41.90             0.46             0.46
+           glcm_cluster_shade               20.61             0.59             0.59
+               diametro_eq_mm               20.61             0.58             0.59
+  anillo_int_glcm_correlacion               20.61             0.55             0.55
+                     area_mm2               20.61             0.31             0.31
+            glcm_homogeneidad               20.61             0.38             0.39
+         anillo_ext_hu_desvio               20.61             0.18             0.18
+        anillo_ext_frac_denso               20.61             0.14             0.14
+anillo_ext_glcm_cluster_shade               20.61             0.39             0.39
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/10 (y AUC >= 0.7 al armar) ==
+    
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.936                     0.919                           NaN
+dosis ×1/2           0.936                     0.857                           NaN
+dosis ×1/4           0.926                     0.857                           NaN
+dosis ×1/10          0.868                     0.807                           NaN
+dosis ×1/20          0.921                     0.814                           NaN
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.936 [0.87-0.99]        0.919 [0.85-0.98]                nan [nan-nan]
+dosis ×1/2   0.936 [0.87-0.99]        0.857 [0.76-0.94]                nan [nan-nan]
+dosis ×1/4   0.926 [0.86-0.98]        0.857 [0.77-0.94]                nan [nan-nan]
+dosis ×1/10  0.868 [0.74-0.96]        0.807 [0.67-0.91]                nan [nan-nan]
+dosis ×1/20  0.921 [0.86-0.98]        0.814 [0.71-0.92]                nan [nan-nan]
+
+== 3. Calcio robusto al ruido ==
+condicion                                              original dosis ×1/2 dosis ×1/4 dosis ×1/10 dosis ×1/20
+sin calcio: calcio falso medio (umbral simple)         0.000122    0.00382   0.016671    0.068097     0.15506
+sin calcio: calcio falso medio (robusto)                    0.0        0.0   0.003796     0.03411    0.100242
+sin calcio: % que parece calcificado (umbral simple)        0.0   4.225352  12.676056   43.661972    60.56338
+sin calcio: % que parece calcificado (robusto)              0.0        0.0   4.225352    19.71831    39.43662
+calcificados: % detectado (umbral simple)                 100.0      100.0      100.0       100.0       100.0
+calcificados: % detectado (robusto)                   90.243902  87.804878  90.243902   95.121951   97.560976
+n sin / con calcio                                      71 / 41    71 / 41    71 / 41     71 / 41     71 / 41
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_uso10.png
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_uso10_sincalcio.png
+
+[08 propuesta (anclaje mas, dosis de uso ×1/10): OK, 0.2 min]
+
+======================================================================
+08 propuesta (anclaje ruido, dosis de uso ×1/10)
+  python scripts/08_propuesta.py --anclaje ruido --dosis-uso 10
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: ruido (lee resultados/07_baja_dosis_anclaje_ruido.csv)
+Dosis de uso para decidir qué es robusto: dosis ×1/10
+
+################ TODOS: 112 nódulos {'benigno': 56, 'sospechoso': 56} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                            medida  ruido_tolerable_hu  CCC dosis ×1/10  ICC dosis ×1/10
+     anillo_ext_glcm_cluster_shade               69.68             0.93             0.94
+                     excentricidad               69.68             0.93             0.93
+               anillo_ext_hu_media               69.68             0.97             0.97
+               anillo_int_hu_media               69.68             0.97             0.97
+               nitidez_borde_hu_mm               69.68             0.99             0.99
+                          hu_media               69.68             1.00             1.00
+                         hu_desvio               69.68             1.00             1.00
+           glcm_cluster_prominence               69.68             0.95             0.95
+                glcm_cluster_shade               69.68             0.95             0.95
+                       frac_calcio               69.68             0.99             0.99
+                          area_mm2               47.41             1.00             1.00
+                      glcm_energia               47.41             0.92             0.92
+anillo_ext_glcm_cluster_prominence               47.41             0.93             0.93
+                    diametro_eq_mm               47.41             1.00             1.00
+           frac_contacto_no_pulmon               47.41             0.98             0.98
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/10 (y AUC >= 0.7 al armar) ==
+    area_mm2, diametro_eq_mm, circularidad, solidez, excentricidad, nitidez_borde_hu_mm, hu_media, hu_desvio, frac_calcio, glcm_energia, glcm_cluster_shade, glcm_cluster_prominence
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.846                     0.938                         0.909
+dosis ×1/2           0.842                     0.934                         0.902
+dosis ×1/4           0.839                     0.908                         0.891
+dosis ×1/10          0.840                     0.862                         0.873
+dosis ×1/20          0.823                     0.819                         0.876
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.846 [0.77-0.92]        0.938 [0.89-0.97]            0.909 [0.85-0.95]
+dosis ×1/2   0.842 [0.76-0.92]        0.934 [0.89-0.97]            0.902 [0.85-0.95]
+dosis ×1/4   0.839 [0.75-0.91]        0.908 [0.85-0.96]            0.891 [0.83-0.94]
+dosis ×1/10  0.840 [0.76-0.92]        0.862 [0.78-0.93]            0.873 [0.81-0.93]
+dosis ×1/20  0.823 [0.73-0.90]        0.819 [0.72-0.90]            0.876 [0.81-0.93]
+
+################ SIN CALCIO: 71 nódulos {'sospechoso': 49, 'benigno': 22} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                            medida  ruido_tolerable_hu  CCC dosis ×1/10  ICC dosis ×1/10
+                          area_mm2               65.97             1.00             1.00
+               nitidez_borde_hu_mm               65.97             0.94             0.94
+               anillo_ext_hu_media               65.97             0.97             0.97
+                    diametro_eq_mm               65.97             1.00             1.00
+                          hu_media               65.97             0.96             0.96
+           frac_contacto_no_pulmon               65.97             0.99             0.99
+                     excentricidad               65.97             0.93             0.93
+                      circularidad               65.97             0.97             0.97
+                           solidez               65.97             0.97             0.97
+               anillo_int_hu_media               44.72             0.97             0.97
+                     solidez_cruda               25.85             0.82             0.82
+                  glcm_correlacion               25.85             0.86             0.86
+anillo_ext_glcm_cluster_prominence               25.85             0.79             0.79
+     anillo_ext_glcm_cluster_shade               25.85             0.83             0.83
+             anillo_ext_frac_denso               25.85             0.75             0.75
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/10 (y AUC >= 0.7 al armar) ==
+    area_mm2, diametro_eq_mm, circularidad, solidez, excentricidad, nitidez_borde_hu_mm, hu_media
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.936                     0.919                         0.843
+dosis ×1/2           0.930                     0.904                         0.855
+dosis ×1/4           0.931                     0.898                         0.865
+dosis ×1/10          0.928                     0.887                         0.871
+dosis ×1/20          0.927                     0.847                         0.857
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.936 [0.87-0.99]        0.919 [0.85-0.98]            0.843 [0.73-0.94]
+dosis ×1/2   0.930 [0.86-0.98]        0.904 [0.83-0.97]            0.855 [0.75-0.94]
+dosis ×1/4   0.931 [0.86-0.98]        0.898 [0.82-0.97]            0.865 [0.77-0.94]
+dosis ×1/10  0.928 [0.86-0.99]        0.887 [0.80-0.96]            0.871 [0.77-0.96]
+dosis ×1/20  0.927 [0.85-0.98]        0.847 [0.75-0.93]            0.857 [0.75-0.95]
+
+== 3. Calcio robusto al ruido ==
+condicion                                              original dosis ×1/2 dosis ×1/4 dosis ×1/10 dosis ×1/20
+sin calcio: calcio falso medio (umbral simple)         0.000122    0.00044   0.002285    0.008358    0.020328
+sin calcio: calcio falso medio (robusto)                    0.0        0.0        0.0         0.0    0.001453
+sin calcio: % que parece calcificado (umbral simple)        0.0        0.0   4.225352   12.676056   22.535211
+sin calcio: % que parece calcificado (robusto)              0.0        0.0        0.0         0.0    4.225352
+calcificados: % detectado (umbral simple)                 100.0      100.0      100.0   97.560976       100.0
+calcificados: % detectado (robusto)                   90.243902  87.804878  90.243902   90.243902   95.121951
+n sin / con calcio                                      71 / 41    71 / 41    71 / 41     71 / 41     71 / 41
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_ruido_uso10.png
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_ruido_uso10_sincalcio.png
+
+[08 propuesta (anclaje ruido, dosis de uso ×1/10): OK, 0.2 min]
+
+======================================================================
+08 propuesta (anclaje hibrido, dosis de uso ×1/10)
+  python scripts/08_propuesta.py --anclaje hibrido --dosis-uso 10
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: hibrido (lee resultados/07_baja_dosis_anclaje_hibrido.csv)
+Dosis de uso para decidir qué es robusto: dosis ×1/10
+
+################ TODOS: 112 nódulos {'benigno': 56, 'sospechoso': 56} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                       medida  ruido_tolerable_hu  CCC dosis ×1/10  ICC dosis ×1/10
+                     hu_media               96.83             0.96             0.96
+                  frac_calcio               96.83             0.91             0.91
+                    hu_desvio               96.83             0.93             0.93
+      frac_contacto_no_pulmon               38.84             0.84             0.84
+      glcm_cluster_prominence               38.84             0.75             0.75
+           glcm_cluster_shade               38.84             0.85             0.86
+             glcm_correlacion               38.84             0.68             0.68
+                 glcm_energia               38.84             0.85             0.85
+          anillo_ext_hu_media               38.84             0.66             0.67
+                 hu_asimetria               38.84             0.59             0.60
+          nitidez_borde_hu_mm               38.84             0.89             0.89
+                excentricidad               38.84             0.70             0.71
+anillo_ext_glcm_cluster_shade               38.84             0.65             0.65
+          anillo_int_hu_media               38.84             0.71             0.71
+        anillo_int_frac_denso               19.27             0.33             0.33
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/10 (y AUC >= 0.7 al armar) ==
+    hu_media, hu_desvio, frac_calcio
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.846                     0.938                         0.732
+dosis ×1/2           0.844                     0.933                         0.736
+dosis ×1/4           0.823                     0.879                         0.734
+dosis ×1/10          0.793                     0.758                         0.685
+dosis ×1/20          0.764                     0.710                         0.671
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.846 [0.77-0.92]        0.938 [0.89-0.97]            0.732 [0.64-0.83]
+dosis ×1/2   0.844 [0.76-0.92]        0.933 [0.89-0.97]            0.736 [0.64-0.83]
+dosis ×1/4   0.823 [0.73-0.90]        0.879 [0.81-0.94]            0.734 [0.64-0.82]
+dosis ×1/10  0.793 [0.70-0.88]        0.758 [0.66-0.85]            0.685 [0.58-0.78]
+dosis ×1/20  0.764 [0.68-0.85]        0.710 [0.60-0.81]            0.671 [0.57-0.77]
+
+################ SIN CALCIO: 71 nódulos {'sospechoso': 49, 'benigno': 22} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                       medida  ruido_tolerable_hu  CCC dosis ×1/10  ICC dosis ×1/10
+                     area_mm2               96.15             1.00             1.00
+               diametro_eq_mm               96.15             0.99             0.99
+      frac_contacto_no_pulmon               96.15             0.98             0.98
+                      solidez               38.13             0.80             0.81
+                     hu_media               38.13             0.76             0.76
+             glcm_correlacion               38.13             0.67             0.68
+                excentricidad               38.13             0.71             0.72
+          anillo_ext_hu_media               38.13             0.85             0.85
+          anillo_int_hu_media               38.13             0.85             0.85
+                 circularidad               38.13             0.75             0.75
+          nitidez_borde_hu_mm               38.13             0.57             0.57
+                solidez_cruda               38.13             0.45             0.46
+           circularidad_cruda               38.13             0.49             0.49
+anillo_ext_glcm_cluster_shade               18.77             0.60             0.60
+  anillo_ext_glcm_correlacion               18.77             0.57             0.57
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/10 (y AUC >= 0.7 al armar) ==
+    area_mm2, diametro_eq_mm
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.936                     0.919                         0.936
+dosis ×1/2           0.930                     0.897                         0.930
+dosis ×1/4           0.928                     0.889                         0.930
+dosis ×1/10          0.911                     0.827                         0.912
+dosis ×1/20          0.887                     0.751                         0.886
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.936 [0.87-0.99]        0.919 [0.85-0.98]            0.936 [0.87-0.99]
+dosis ×1/2   0.930 [0.86-0.99]        0.897 [0.82-0.96]            0.930 [0.86-0.99]
+dosis ×1/4   0.928 [0.86-0.99]        0.889 [0.80-0.96]            0.930 [0.86-0.99]
+dosis ×1/10  0.911 [0.82-0.98]        0.827 [0.72-0.93]            0.912 [0.82-0.98]
+dosis ×1/20  0.887 [0.80-0.96]        0.751 [0.61-0.88]            0.886 [0.80-0.96]
+
+== 3. Calcio robusto al ruido ==
+condicion                                              original dosis ×1/2 dosis ×1/4 dosis ×1/10 dosis ×1/20
+sin calcio: calcio falso medio (umbral simple)         0.000122   0.000231   0.008864    0.042005     0.12194
+sin calcio: calcio falso medio (robusto)                    0.0        0.0    0.00272    0.018338    0.070679
+sin calcio: % que parece calcificado (umbral simple)        0.0        0.0  11.267606   32.394366   61.971831
+sin calcio: % que parece calcificado (robusto)              0.0        0.0   1.408451   14.084507   38.028169
+calcificados: % detectado (umbral simple)                 100.0  97.560976      100.0   97.560976       100.0
+calcificados: % detectado (robusto)                   90.243902  87.804878  92.682927   97.560976   97.560976
+n sin / con calcio                                      71 / 41    71 / 41    71 / 41     71 / 41     71 / 41
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_hibrido_uso10.png
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_hibrido_uso10_sincalcio.png
+
+[08 propuesta (anclaje hibrido, dosis de uso ×1/10): OK, 0.2 min]
+
+======================================================================
+Incertidumbre, anclaje por ruido (110 nódulos; retoma los hechos)
+  python comparaciones/incertidumbre_dosis.py --carpeta datos/cortes --muestras 50 --anclaje ruido --casos 110
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Retomando: 65 nódulos ya calculados en una corrida anterior.
+[1] LIDC-IDRI-0004_s15_n0: ya estaba
+[2] LIDC-IDRI-0067_s78_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±65.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±101.3 %
+[3] LIDC-IDRI-0294_s294_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±55.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±81.5 %
+[4] LIDC-IDRI-0066_s77_n2: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±100.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±104.0 %
+[5] LIDC-IDRI-0486_s492_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±76.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±145.6 %
+[6] LIDC-IDRI-0433_s437_n2: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±64.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±90.3 %
+[7] LIDC-IDRI-0119_s124_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±56.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±82.8 %
+[8] LIDC-IDRI-0409_s413_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±44.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±85.0 %
+[9] LIDC-IDRI-0084_s92_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±41.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±79.0 %
+[10] LIDC-IDRI-0011_s22_n5: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±42.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±88.2 %
+[11] LIDC-IDRI-0077_s87_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±36.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±90.5 %
+[12] LIDC-IDRI-0309_s309_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±32.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±72.2 %
+[13] LIDC-IDRI-0298_s298_n2: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±31.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±75.3 %
+[14] LIDC-IDRI-0492_s498_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±26.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±76.9 %
+[15] LIDC-IDRI-0583_s589_n13: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±28.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±79.2 %
+[16] LIDC-IDRI-0141_s144_n4: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±26.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±66.8 %
+[17] LIDC-IDRI-0456_s461_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±25.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±58.2 %
+[18] LIDC-IDRI-0011_s22_n9: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±24.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±54.2 %
+[19] LIDC-IDRI-0087_s95_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±24.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±50.2 %
+[20] LIDC-IDRI-0318_s319_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±22.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±50.0 %
+[21] LIDC-IDRI-0424_s428_n2: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±21.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±48.0 %
+[22] LIDC-IDRI-0562_s568_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±19.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±47.7 %
+[23] LIDC-IDRI-0608_s613_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±17.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±46.2 %
+[24] LIDC-IDRI-0358_s361_n5: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±18.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±49.9 %
+[25] LIDC-IDRI-0794_s861_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±17.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±46.4 %
+[26] LIDC-IDRI-0018_s29_n3: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±18.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±42.3 %
+[27] LIDC-IDRI-0160_s161_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±20.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±41.2 %
+[28] LIDC-IDRI-0403_s407_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±20.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±40.6 %
+[29] LIDC-IDRI-0445_s450_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±19.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±40.3 %
+[30] LIDC-IDRI-0576_s582_n2: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±20.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±39.7 %
+[31] LIDC-IDRI-0608_s613_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±17.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±39.6 %
+[32] LIDC-IDRI-0791_s864_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±19.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±38.8 %
+[33] LIDC-IDRI-0913_s742_n2: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±18.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±35.0 %
+[34] LIDC-IDRI-0021_s32_n2: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±18.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±34.6 %
+[35] LIDC-IDRI-0160_s161_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±18.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±36.6 %
+[36] LIDC-IDRI-0407_s411_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±17.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±35.4 %
+[37] LIDC-IDRI-0481_s486_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±16.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±35.0 %
+[38] LIDC-IDRI-0587_s592_n4: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±16.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±34.7 %
+[39] LIDC-IDRI-0617_s622_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±16.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±34.1 %
+[40] LIDC-IDRI-0023_s34_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±15.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±33.3 %
+[41] LIDC-IDRI-0163_s164_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±16.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±33.6 %
+[42] LIDC-IDRI-0420_s424_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±15.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±31.1 %
+[43] LIDC-IDRI-0481_s486_n3: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±16.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±32.9 %
+[44] LIDC-IDRI-0601_s606_n4: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±18.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±33.2 %
+[45] LIDC-IDRI-0617_s622_n2: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±17.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±31.9 %
+[46] LIDC-IDRI-0024_s35_n2: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±16.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±31.8 %
+[47] LIDC-IDRI-0195_s196_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±15.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±28.6 %
+[48] LIDC-IDRI-0463_s468_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±16.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±29.1 %
+[49] LIDC-IDRI-0481_s486_n6: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±15.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±28.6 %
+[50] LIDC-IDRI-0814_s841_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±15.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±29.3 %
+[51] LIDC-IDRI-0835_s820_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±15.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±28.2 %
+[52] LIDC-IDRI-0031_s42_n2: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±15.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±26.9 %
+[53] LIDC-IDRI-0195_s196_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±15.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±25.2 %
+[54] LIDC-IDRI-0625_s630_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±15.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±29.4 %
+[55] LIDC-IDRI-0775_s880_n2: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±15.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±26.5 %
+[56] LIDC-IDRI-0822_s833_n6: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±15.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±28.5 %
+[57] LIDC-IDRI-0912_s743_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±14.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±26.7 %
+[58] LIDC-IDRI-0031_s42_n4: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±14.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±26.7 %
+[59] LIDC-IDRI-0195_s196_n2: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±14.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±26.6 %
+[60] LIDC-IDRI-0648_s1007_n2: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±14.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±26.7 %
+[61] LIDC-IDRI-0775_s880_n3: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±13.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±25.3 %
+[62] LIDC-IDRI-0942_s713_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±14.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±24.9 %
+[63] LIDC-IDRI-0037_s48_n1: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±15.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±25.3 %
+[64] LIDC-IDRI-0195_s196_n6: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±15.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±24.2 %
+[65] LIDC-IDRI-0717_s938_n0: ya estaba
+    convergencia: mediana/P25/P75 se mueven hasta ±13.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±24.4 %
+
+[66] LIDC-IDRI-0776_s879_n0 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±13.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±22.7 %
+
+[67] LIDC-IDRI-1002_s653_n0 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±23.4 %
+
+[68] LIDC-IDRI-0039_s50_n0 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±23.1 %
+
+[69] LIDC-IDRI-0196_s197_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±22.0 %
+
+[70] LIDC-IDRI-0732_s923_n1 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±13.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±23.1 %
+
+[71] LIDC-IDRI-0776_s879_n2 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±13.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±22.9 %
+
+[72] LIDC-IDRI-1002_s653_n1 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±13.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±22.0 %
+
+[73] LIDC-IDRI-0039_s50_n3 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±13.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±22.4 %
+
+[74] LIDC-IDRI-0217_s218_n1 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±21.4 %
+
+[75] LIDC-IDRI-0740_s915_n0 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±21.0 %
+
+[76] LIDC-IDRI-0825_s830_n0 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±21.6 %
+
+[77] LIDC-IDRI-1002_s653_n2 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±21.7 %
+
+[78] LIDC-IDRI-0043_s54_n0 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±20.9 %
+
+[79] LIDC-IDRI-0217_s218_n2 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±19.6 %
+
+[80] LIDC-IDRI-0777_s878_n1 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±20.2 %
+
+[81] LIDC-IDRI-0044_s55_n1 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±19.2 %
+
+[82] LIDC-IDRI-0229_s230_n2 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±19.2 %
+
+[83] LIDC-IDRI-0801_s854_n1 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±19.2 %
+
+[84] LIDC-IDRI-0045_s56_n2 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±17.6 %
+
+[85] LIDC-IDRI-0229_s230_n3 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±20.3 %
+
+[86] LIDC-IDRI-0807_s848_n3 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±19.9 %
+
+[87] LIDC-IDRI-0046_s57_n4 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±19.1 %
+
+[88] LIDC-IDRI-0248_s248_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±19.3 %
+
+[89] LIDC-IDRI-0843_s812_n3 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±18.3 %
+
+[90] LIDC-IDRI-0049_s60_n14 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±18.9 %
+
+[91] LIDC-IDRI-0256_s256_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±17.7 %
+
+[92] LIDC-IDRI-0843_s812_n5 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±17.6 %
+
+[93] LIDC-IDRI-0051_s62_n1 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±18.0 %
+
+[94] LIDC-IDRI-0257_s257_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±16.5 %
+
+[95] LIDC-IDRI-0860_s795_n0 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±19.3 %
+
+[96] LIDC-IDRI-0052_s63_n0 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±21.5 %
+
+[97] LIDC-IDRI-0262_s262_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±19.6 %
+
+[98] LIDC-IDRI-0863_s792_n0 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±20.1 %
+
+[99] LIDC-IDRI-0055_s66_n4 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±18.5 %
+
+[100] LIDC-IDRI-0276_s276_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±18.7 %
+
+[101] LIDC-IDRI-0933_s722_n4 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±18.8 %
+
+[102] LIDC-IDRI-0057_s68_n0 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±19.6 %
+
+[103] LIDC-IDRI-0281_s281_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±19.7 %
+
+[104] LIDC-IDRI-0997_s658_n2 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±18.3 %
+
+[105] LIDC-IDRI-0059_s70_n0 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±9.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±18.3 %
+
+[106] LIDC-IDRI-0284_s284_n2 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±17.9 %
+
+[107] LIDC-IDRI-1003_s652_n1 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±9.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±18.1 %
+
+[108] LIDC-IDRI-0060_s71_n0 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±9.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±17.3 %
+
+[109] LIDC-IDRI-0287_s287_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±9.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±18.1 %
+
+[110] LIDC-IDRI-1003_s652_n2 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±9.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±17.6 %
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/comparaciones/incertidumbre_convergencia_ruido.png
+
+== Dosis REAL de cada etiqueta (anclaje ruido, 110 nódulos) ==
+   error de Φ: medido en LIDC (07a); error de medir el ruido: medido en LIDC (07a); ruido no cuántico: medido en LIDC (07a)
+   ×1/2    -> mediana 1/2.3;  95 % entre 1/1.2 y 1/4.4  (mitad central 1/1.9 a 1/2.8)
+   ×1/4    -> mediana 1/4.6;  95 % entre 1/1.7 y 1/10.4  (mitad central 1/3.4 a 1/6.0)
+   ×1/10   -> mediana 1/9.9;  95 % entre 1/2.6 y 1/25.9  (mitad central 1/6.7 a 1/13.8)
+   ×1/20   -> mediana 1/16.6;  95 % entre 1/3.7 y 1/48.0  (mitad central 1/10.4 a 1/24.3)
+   entre nódulos, la mediana de ×1/4 va de 1/1.9 a 1/8.9
+
+== Qué explica la incertidumbre de ×1/4, anclaje ruido (% de la variabilidad, R² de rangos) ==
+       parametro                               descripcion  rho  porcentaje
+        sigma_e2             ruido electrónico por lectura -0.4        35.8
+     error_ruido          error al medir el ruido original  0.3        26.8
+frac_no_cuantica parte del ruido medido que no es cuántica  0.3        22.3
+      sff_bowtie                factor del bowtie (Kramer)  0.2         6.6
+ vistas_rotacion                       vistas por rotación -0.1         3.8
+   ancho_fila_mm                             ancho de fila  0.1         2.2
+         ventana       ventana del kernel (familia vecina) -0.1         1.6
+  ancho_canal_mm            ancho de canal en el isocentro  0.0         0.4
+         mu_pmma            μ efectivo del PMMA del bowtie  0.0         0.4
+          dsi_mm                distancia fuente-isocentro -0.0         0.0
+    n_vistas_sim                   vistas de la simulación -0.0         0.0
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/comparaciones/incertidumbre_dosis_ruido.png
+
+[Incertidumbre, anclaje por ruido (110 nódulos; retoma los hechos): OK, 77.0 min]
+
+======================================================================
+Incertidumbre, anclaje por corriente × Φ (30 nódulos)
+  python comparaciones/incertidumbre_dosis.py --carpeta datos/cortes --muestras 50 --anclaje mas --casos 30
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+
+[1] LIDC-IDRI-0004_s15_n0 (GE/suave)
+
+[2] LIDC-IDRI-0067_s78_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±16.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±21.2 %
+
+[3] LIDC-IDRI-0294_s294_n1 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±27.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±39.4 %
+
+[4] LIDC-IDRI-0066_s77_n2 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±32.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±52.2 %
+
+[5] LIDC-IDRI-0486_s492_n0 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±30.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±51.8 %
+
+[6] LIDC-IDRI-0433_s437_n2 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±26.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±53.6 %
+
+[7] LIDC-IDRI-0119_s124_n0 (SIEMENS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±21.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±49.5 %
+
+[8] LIDC-IDRI-0409_s413_n0 (PHILIPS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±22.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±62.2 %
+
+[9] LIDC-IDRI-0084_s92_n1 (TOSHIBA/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±20.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±56.9 %
+
+[10] LIDC-IDRI-0011_s22_n5 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±18.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±44.6 %
+
+[11] LIDC-IDRI-0077_s87_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±17.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±46.4 %
+
+[12] LIDC-IDRI-0309_s309_n1 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±42.5 %
+
+[13] LIDC-IDRI-0298_s298_n2 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±42.2 %
+
+[14] LIDC-IDRI-0492_s498_n1 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±14.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±43.0 %
+
+[15] LIDC-IDRI-0583_s589_n13 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±42.6 %
+
+[16] LIDC-IDRI-0141_s144_n4 (SIEMENS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±43.4 %
+
+[17] LIDC-IDRI-0456_s461_n0 (PHILIPS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±38.8 %
+
+[18] LIDC-IDRI-0011_s22_n9 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±35.4 %
+
+[19] LIDC-IDRI-0087_s95_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±39.2 %
+
+[20] LIDC-IDRI-0318_s319_n0 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±35.4 %
+
+[21] LIDC-IDRI-0424_s428_n2 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±33.5 %
+
+[22] LIDC-IDRI-0562_s568_n1 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±9.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±32.8 %
+
+[23] LIDC-IDRI-0608_s613_n0 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±9.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±32.6 %
+
+[24] LIDC-IDRI-0358_s361_n5 (SIEMENS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±9.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±32.4 %
+
+[25] LIDC-IDRI-0794_s861_n0 (PHILIPS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±8.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±30.6 %
+
+[26] LIDC-IDRI-0018_s29_n3 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±8.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±30.1 %
+
+[27] LIDC-IDRI-0160_s161_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±8.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±28.1 %
+
+[28] LIDC-IDRI-0403_s407_n0 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±7.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±31.7 %
+
+[29] LIDC-IDRI-0445_s450_n1 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±7.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±27.8 %
+
+[30] LIDC-IDRI-0576_s582_n2 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±7.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±23.6 %
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/comparaciones/incertidumbre_convergencia_mas.png
+
+== Dosis REAL de cada etiqueta (anclaje mas, 30 nódulos) ==
+   error de Φ: medido en LIDC (07a); error de medir el ruido: medido en LIDC (07a); ruido no cuántico: medido en LIDC (07a)
+   ×1/2    -> mediana 1/3.5;  95 % entre 1/1.5 y 1/11.1  (mitad central 1/2.6 a 1/5.1)
+   ×1/4    -> mediana 1/8.2;  95 % entre 1/2.4 y 1/28.1  (mitad central 1/5.6 a 1/12.7)
+   ×1/10   -> mediana 1/21.8;  95 % entre 1/5.1 y 1/79.5  (mitad central 1/14.0 a 1/35.0)
+   ×1/20   -> mediana 1/44.3;  95 % entre 1/9.2 y 1/173.1  (mitad central 1/27.8 a 1/72.9)
+   entre nódulos, la mediana de ×1/4 va de 1/6.4 a 1/12.1
+
+== Qué explica la incertidumbre de ×1/4, anclaje mas (% de la variabilidad, R² de rangos) ==
+       parametro                               descripcion  rho  porcentaje
+           k_phi          error de la constante del tubo Φ -0.7        74.4
+        sigma_e2             ruido electrónico por lectura -0.3        13.4
+frac_no_cuantica parte del ruido medido que no es cuántica  0.2         5.0
+      sff_bowtie                factor del bowtie (Kramer)  0.2         4.4
+   ancho_fila_mm                             ancho de fila  0.1         1.1
+ vistas_rotacion                       vistas por rotación -0.1         0.7
+  ancho_canal_mm            ancho de canal en el isocentro  0.1         0.4
+   exponente_kvp         exponente kVp (estudio a 140 kVp) -0.1         0.4
+         ventana       ventana del kernel (familia vecina) -0.0         0.1
+         mu_pmma            μ efectivo del PMMA del bowtie  0.0         0.1
+    n_vistas_sim                   vistas de la simulación  0.0         0.0
+          dsi_mm                distancia fuente-isocentro -0.0         0.0
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/comparaciones/incertidumbre_dosis_mas.png
+
+[Incertidumbre, anclaje por corriente × Φ (30 nódulos): OK, 49.3 min]
+
+======================================================================
+Incertidumbre, anclaje híbrido (30 nódulos)
+  python comparaciones/incertidumbre_dosis.py --carpeta datos/cortes --muestras 50 --anclaje hibrido --casos 30
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+
+[1] LIDC-IDRI-0004_s15_n0 (GE/suave)
+
+[2] LIDC-IDRI-0067_s78_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±22.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±43.5 %
+
+[3] LIDC-IDRI-0294_s294_n1 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±20.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±49.0 %
+
+[4] LIDC-IDRI-0066_s77_n2 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±52.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±54.5 %
+
+[5] LIDC-IDRI-0486_s492_n0 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±40.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±40.1 %
+
+[6] LIDC-IDRI-0433_s437_n2 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±34.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±39.6 %
+
+[7] LIDC-IDRI-0119_s124_n0 (SIEMENS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±26.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±38.7 %
+
+[8] LIDC-IDRI-0409_s413_n0 (PHILIPS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±20.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±39.6 %
+
+[9] LIDC-IDRI-0084_s92_n1 (TOSHIBA/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±18.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±38.6 %
+
+[10] LIDC-IDRI-0011_s22_n5 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±16.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±37.4 %
+
+[11] LIDC-IDRI-0077_s87_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±15.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±34.8 %
+
+[12] LIDC-IDRI-0309_s309_n1 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±12.9 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±35.3 %
+
+[13] LIDC-IDRI-0298_s298_n2 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±13.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±34.3 %
+
+[14] LIDC-IDRI-0492_s498_n1 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±35.4 %
+
+[15] LIDC-IDRI-0583_s589_n13 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±11.0 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±35.6 %
+
+[16] LIDC-IDRI-0141_s144_n4 (SIEMENS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±36.6 %
+
+[17] LIDC-IDRI-0456_s461_n0 (PHILIPS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±34.2 %
+
+[18] LIDC-IDRI-0011_s22_n9 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±33.9 %
+
+[19] LIDC-IDRI-0087_s95_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±33.9 %
+
+[20] LIDC-IDRI-0318_s319_n0 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±10.4 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±34.3 %
+
+[21] LIDC-IDRI-0424_s428_n2 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±9.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±33.9 %
+
+[22] LIDC-IDRI-0562_s568_n1 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±7.8 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±29.9 %
+
+[23] LIDC-IDRI-0608_s613_n0 (PHILIPS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±8.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±30.2 %
+
+[24] LIDC-IDRI-0358_s361_n5 (SIEMENS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±7.6 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±28.0 %
+
+[25] LIDC-IDRI-0794_s861_n0 (PHILIPS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±7.5 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±28.6 %
+
+[26] LIDC-IDRI-0018_s29_n3 (GE/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±7.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±27.9 %
+
+[27] LIDC-IDRI-0160_s161_n0 (GE/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±7.3 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±27.0 %
+
+[28] LIDC-IDRI-0403_s407_n0 (SIEMENS/suave)
+    convergencia: mediana/P25/P75 se mueven hasta ±6.1 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±28.2 %
+
+[29] LIDC-IDRI-0445_s450_n1 (SIEMENS/intermedio)
+    convergencia: mediana/P25/P75 se mueven hasta ±6.7 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±26.9 %
+
+[30] LIDC-IDRI-0576_s582_n2 (PHILIPS/duro)
+    convergencia: mediana/P25/P75 se mueven hasta ±6.2 % (objetivo ±5 %); extremos 2,5/97,5 hasta ±24.2 %
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/comparaciones/incertidumbre_convergencia_hibrido.png
+
+== Dosis REAL de cada etiqueta (anclaje hibrido, 30 nódulos) ==
+   error de Φ: medido en LIDC (07a); error de medir el ruido: medido en LIDC (07a); ruido no cuántico: medido en LIDC (07a)
+   ×1/2    -> mediana 1/2.8;  95 % entre 1/1.5 y 1/6.7  (mitad central 1/2.3 a 1/3.4)
+   ×1/4    -> mediana 1/6.2;  95 % entre 1/2.5 y 1/17.8  (mitad central 1/4.7 a 1/8.1)
+   ×1/10   -> mediana 1/16.2;  95 % entre 1/5.5 y 1/50.0  (mitad central 1/11.5 a 1/22.7)
+   ×1/20   -> mediana 1/33.1;  95 % entre 1/10.5 y 1/107.1  (mitad central 1/22.3 a 1/47.6)
+   entre nódulos, la mediana de ×1/4 va de 1/4.9 a 1/9.8
+
+== Qué explica la incertidumbre de ×1/4, anclaje hibrido (% de la variabilidad, R² de rangos) ==
+       parametro                               descripcion  rho  porcentaje
+     error_ruido          error al medir el ruido original  0.5        36.8
+        sigma_e2             ruido electrónico por lectura -0.4        32.5
+frac_no_cuantica parte del ruido medido que no es cuántica  0.3        15.0
+      sff_bowtie                factor del bowtie (Kramer)  0.2        10.3
+ vistas_rotacion                       vistas por rotación -0.1         3.0
+   ancho_fila_mm                             ancho de fila  0.1         1.4
+         ventana       ventana del kernel (familia vecina) -0.0         0.4
+    n_vistas_sim                   vistas de la simulación  0.0         0.3
+         mu_pmma            μ efectivo del PMMA del bowtie  0.0         0.2
+  ancho_canal_mm            ancho de canal en el isocentro  0.0         0.2
+          dsi_mm                distancia fuente-isocentro  0.0         0.0
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/comparaciones/incertidumbre_dosis_hibrido.png
+
+[Incertidumbre, anclaje híbrido (30 nódulos): OK, 54.0 min]
+
+======================================================================
+Gráfico comparando los tres anclajes
+  python comparaciones/incertidumbre_dosis.py --carpeta datos/cortes --muestras 50 --solo-comparar
+======================================================================
+
+== Comparación de anclajes: ancho del IC 95 % (máx/mín; 1 = sin incertidumbre) y sesgo de la mediana ==
+anclaje   hibrido    mas  ruido
+etiqueta                       
+×1/10        9.00  15.57   9.95
+×1/2         4.43   7.57   3.52
+×1/20       10.20  18.75  12.92
+×1/4         7.07  11.52   6.25
+anclaje   hibrido    mas  ruido
+etiqueta                       
+×1/10        62.0  118.0   -1.0
+×1/2         38.0   75.0   17.0
+×1/20        66.0  121.0  -17.0
+×1/4         54.0  105.0   15.0
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/comparaciones/incertidumbre_anclajes.png
+
+[Gráfico comparando los tres anclajes: OK, 0.0 min]
+
+Listo (3.0 h). Todo quedó en /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/resultados/log_baja_dosis.txt
+
+######################################################################
+# ETAPA: electronico
+######################################################################
+
+======================================================================
+Calibración, errores del ruido y ruido electrónico estimado con LIDC (07a)
+  python scripts/07a_calibrar_dosis.py
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+
+== Tags de exposición por fabricante (por qué se ancla con la corriente, mA) ==
+           exposicion_mas               tiempo_exposicion_ms              corriente_ma            
+                    count min  50%  max                count min 50%  max        count min 50% max
+fabricante                                                                                        
+GE                    123   1  880 7200                  123 400 570 1160          123  40 265 570
+PHILIPS                20 154  250  350                    0 NaN NaN  NaN           20 240 360 422
+SIEMENS                34  25 37.5  324                   26 500 500  600           34  50 105 561
+TOSHIBA                 1 130  130  130                    1 500 500  500            1 260 260 260
+Calibrando con 217 cortes (7 procesos)...
+
+Estudios con corriente y ruido medible: 178  |  calibración: ≥ 301 mA, validación (baja dosis de LIDC): ≤ 160 mA
+
+== Estudios de calibración y de validación (tomografías reales de LIDC) ==
+                        estudios  cortes  ma_min  ma_mediana  ma_max
+rol         fabricante                                              
+calibración GE                40      52     301         360     570
+            PHILIPS           13      14     350         412     422
+            SIEMENS            7      11     342         440     488
+validación  GE                57      65      40         160     160
+            SIEMENS           23      28      50          75     150
+             estudios  cortes
+rol                          
+calibración        60      77
+validación         80      93
+
+Constante del tubo Φ (fotones / (mA·mm²), absorbe tiempo de rotación y pitch); iqr_relativo = P75/P25 (1 = todos iguales):
+fabricante      phi  n_estudios  iqr_relativo
+     TODOS 2.83e+05          60          2.15
+        GE  2.4e+05          40          2.16
+   PHILIPS 6.05e+05          13           1.6
+(valor inicial de config: 2e+06)
+
+Φ_i por familia de kernel (si la ventana elegida para un kernel estuviera mal, se nota acá):
+                count      25%      50%      75%
+familia_kernel                                  
+duro               55 2.97e+05  3.7e+05 5.82e+05
+intermedio         12 2.45e+05 3.69e+05 4.12e+05
+suave             111 2.53e+05 3.71e+05 4.91e+05
+
+Anclaje por corriente × Φ del fabricante vs. por el ruido de cada estudio:
+   k = Φ_fab/Φ_i: mediana 0.73, P25 0.54, P75 1.00
+   etiqueta 1/2: en la mitad central de los estudios es de verdad entre 1/2.0 y 1/2.9
+   etiqueta 1/4: en la mitad central de los estudios es de verdad entre 1/4.0 y 1/6.6
+   etiqueta 1/10: en la mitad central de los estudios es de verdad entre 1/10.0 y 1/17.7
+   etiqueta 1/20: en la mitad central de los estudios es de verdad entre 1/20.0 y 1/36.3
+
+== Error de medición del ruido en cada imagen (mitades del tejido blando) ==
+   mediana 4.5 %, P90 18.8 %  (literatura, Christianson 2015: 3,4-4,7 %) -> en fotones ~9 %
+
+== Ruido que no baja con la dosis (σ0² = cuántico/mA + b) ==
+   fracción del ruido medido que NO es cuántica (mediana entre estudios, IC 95 % por bootstrap):
+fabricante  n_estudios     b  b_ic95_inf  b_ic95_sup  frac_no_cuantica_mediana  frac_no_cuantica_ic95_inf  frac_no_cuantica_ic95_sup
+     TODOS         178 0.191       0.109       0.279                     0.381                      0.217                      0.556
+        GE         123 0.166      0.0817       0.255                     0.333                      0.164                      0.511
+   PHILIPS          20  0.08    -0.00893        0.16                     0.642                          0                          1
+   SIEMENS          34 0.603       0.157        1.26                     0.521                      0.136                          1
+
+== Φ dentro de cada modelo de tomógrafo: dispersión observada vs la que daría solo medir mal el ruido ==
+fabricante            modelo  n_estudios  dispersion_phi  dispersion_esperada_por_medicion  cociente
+        GE   LightSpeed Plus          18            0.67                              0.40      1.69
+        GE LightSpeed Pro 16          14            0.51                              0.09      5.50
+        GE   LightSpeed QX/i           6            1.20                              0.26      4.65
+        GE  LightSpeed Ultra          28            0.34                              0.09      3.63
+        GE    LightSpeed VCT          14            0.47                              0.11      4.11
+        GE      LightSpeed16          42            0.39                              0.08      5.12
+   PHILIPS    Brilliance 16P          14            0.53                              0.26      2.00
+   PHILIPS     Brilliance 40           4            0.39                              0.13      3.05
+   SIEMENS      Sensation 16          20            0.40                              0.04     10.27
+   SIEMENS      Sensation 64          12            0.62                              0.06     11.03
+   cociente mediano 4.4: > 1 -> los estudios de un mismo modelo difieren de verdad; el anclaje por ruido/híbrido evita ese error (ver incertidumbre_dosis.py para el intervalo de cada uno)
+
+== Ruido electrónico estimado con LIDC (σ0² = cuántico/I + electrónico/I² + no cuántico) ==
+   177 estudios (GE 123, PHILIPS 20, SIEMENS 34), de 40 a 570 mA; 500 remuestreos
+   σe² por lectura: 6.0  (IC 95 % 0.0 - 33.7);  valor de literatura usado: 30
+   ruido no cuántico b: 9.1 HU de desvío (IC 95 % 6.7 - 11.3)
+   peso del electrónico en el ruido de cada estudio: mediana 2.6 %, máximo 28.9 % (en el de menos corriente)
+   ajuste con σe² fijo en 0: error RMS 51.6 %  (con σe² estimado: 51.5 %)
+   ajuste con σe² fijo en 30: error RMS 52.1 %  (con σe² estimado: 51.5 %)
+   -> 30 queda dentro del intervalo: los datos no permiten descartarlo.
+
+Validación (93 cortes de baja dosis), sin electrónico: error relativo mediano +24 %  (P25 +11 %, P75 +42 %)
+
+Validación (93 cortes de baja dosis), con electrónico: error relativo mediano +52 %  (P25 +31 %, P75 +73 %)
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/07a_calibracion.png
+
+[Calibración, errores del ruido y ruido electrónico estimado con LIDC (07a): OK, 5.8 min]
+
+======================================================================
+07 híbrido con el σe² estimado en LIDC
+  python scripts/07_baja_dosis.py --anclaje hibrido --sigma-e2 lidc
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Ruido electrónico por lectura: 6 (en lugar de 30)
+Simulando 217 nódulos × 7 condiciones (T = -475 HU, cierre 20 mm) con 7 procesos...
+  constante del tubo: 07a (calibrado con LIDC); ruido electrónico: sí
+  20/217
+  40/217
+  60/217
+  80/217
+  100/217
+  120/217
+  140/217
+  160/217
+  180/217
+  200/217
+  217/217
+
+Población: 112 nódulos de entrenamiento {'benigno': 56, 'sospechoso': 56}
+
+== a. Segmentación en cada condición ==
+             ruido_agregado_hu  ruido_total_pulmon_hu  mas_equivalente    n  frac_calcio_media  dice_medio  aceptables
+condicion                                                                                                             
+original                 0.000                 15.639            240.0  112              0.153       0.892       1.000
+dosis ×1/2              16.408                 22.922            120.0  112              0.154       0.890       0.964
+dosis ×1/4              29.601                 33.750             60.0  112              0.157       0.889       0.938
+dosis ×1/10             57.850                 60.166             24.0  112              0.171       0.868       0.839
+dosis ×1/20             99.960                101.132             12.0  112              0.204       0.851       0.759
+JPEG q50                16.514                    NaN              NaN  112              0.140       0.890       0.964
+JPEG q25                23.974                    NaN              NaN  112              0.134       0.886       0.938
+
+== b. Reproducibilidad (CCC de Lin vs original; ≥ 0,9 robusta, < 0,7 frágil) ==
+                                    dosis ×1/2  dosis ×1/4  dosis ×1/10  dosis ×1/20  JPEG q50  JPEG q25
+medida                                                                                                  
+hu_media                                  1.00        1.00         0.99         0.98      0.60      0.57
+hu_desvio                                 1.00        1.00         0.99         0.96      0.37      0.36
+nitidez_borde_hu_mm                       1.00        1.00         0.98         0.93      0.74      0.72
+frac_calcio                               1.00        1.00         0.97         0.91      0.98      0.97
+anillo_int_hu_media                       1.00        0.98         0.95         0.77      1.00      0.99
+anillo_ext_hu_media                       1.00        0.99         0.93         0.72      1.00      0.99
+glcm_cluster_shade                        0.98        0.98         0.93         0.87      0.98      0.93
+glcm_cluster_prominence                   0.98        0.97         0.90         0.77      0.98      0.94
+glcm_energia                              0.99        0.96         0.90         0.85      0.92      0.88
+frac_fina                                 0.95        0.87         0.87         0.53      0.94      0.95
+frac_contacto_no_pulmon                   1.00        0.99         0.86         0.84      0.99      0.99
+excentricidad                             0.98        0.94         0.84         0.78      0.97      0.97
+glcm_entropia                             0.98        0.94         0.82         0.70      0.87      0.82
+solidez                                   0.99        0.96         0.81         0.61      0.95      0.93
+glcm_correlacion                          0.98        0.94         0.80         0.61      0.97      0.94
+anillo_ext_glcm_cluster_shade             0.99        0.95         0.80         0.55      0.99      0.99
+circularidad_cruda                        0.97        0.95         0.79         0.52      0.97      0.97
+glcm_homogeneidad                         0.98        0.93         0.79         0.64      0.92      0.87
+hu_asimetria                              0.99        0.96         0.78         0.57      0.69      0.69
+circularidad                              0.99        0.96         0.78         0.61      0.95      0.95
+solidez_cruda                             0.97        0.94         0.78         0.47      0.94      0.95
+anillo_ext_glcm_cluster_prominence        0.99        0.95         0.78         0.42      0.99      0.99
+hu_curtosis                               0.99        0.95         0.76         0.50      0.80      0.79
+glcm_contraste                            0.99        0.97         0.73         0.36      0.98      0.96
+anillo_int_glcm_correlacion               0.94        0.86         0.69         0.55      0.97      0.93
+anillo_int_frac_denso                     0.94        0.89         0.67         0.30      0.95      0.72
+anillo_ext_glcm_correlacion               0.96        0.88         0.67         0.55      0.98      0.93
+diametro_eq_mm                            1.00        1.00         0.65         0.83      1.00      1.00
+anillo_ext_hu_desvio                      0.98        0.90         0.64         0.30      0.99      0.98
+n_estructuras_convergentes                0.84        0.72         0.63         0.47      0.71      0.76
+anillo_ext_frac_denso                     0.98        0.92         0.59         0.21      0.96      0.92
+anillo_int_glcm_energia                   0.94        0.82         0.57         0.38      0.94      0.83
+anillo_int_glcm_entropia                  0.93        0.81         0.54         0.33      0.96      0.88
+anillo_ext_glcm_entropia                  0.94        0.80         0.52         0.34      0.98      0.95
+anillo_int_hu_desvio                      0.95        0.88         0.49         0.24      0.98      0.95
+anillo_int_glcm_homogeneidad              0.91        0.75         0.47         0.31      0.94      0.85
+esqueleto_mm_por_mm_borde                 0.85        0.76         0.47         0.14      0.86      0.67
+anillo_ext_glcm_homogeneidad              0.91        0.74         0.47         0.31      0.98      0.93
+anillo_int_glcm_cluster_shade             0.97        0.86         0.46         0.30      0.98      0.93
+anillo_ext_glcm_energia                   0.91        0.73         0.42         0.29      0.96      0.89
+convergentes_por_10mm_borde               0.57        0.48         0.39         0.27      0.60      0.42
+anillo_int_glcm_cluster_prominence        0.97        0.86         0.36         0.20      0.98      0.94
+anillo_int_glcm_contraste                 0.92        0.74         0.32         0.14      0.98      0.95
+anillo_ext_glcm_contraste                 0.94        0.71         0.28         0.12      0.99      0.97
+area_mm2                                  1.00        1.00         0.23         0.61      1.00      1.00
+frac_aire                                 1.00        1.00         0.00         0.00      1.00      0.77
+
+== c. AUC (validación cruzada por paciente) ==
+   re-armado = armado y evaluado con esa dosis; transferido = armado con la original
+TRANSFERIDO      diámetro solo  interior  interior + entorno  interior sin tamaño
+condicion                                                                    
+original             0.846     0.938               0.938                0.905
+dosis ×1/2           0.842     0.936               0.936                0.908
+dosis ×1/4           0.841     0.915               0.915                0.888
+dosis ×1/10          0.822     0.824               0.824                0.818
+dosis ×1/20          0.822     0.760               0.760                0.752
+JPEG q50             0.843     0.922               0.922                0.896
+JPEG q25             0.840     0.908               0.908                0.881
+RE-ARMADO      diámetro solo  interior  interior + entorno  interior sin tamaño
+condicion                                                                    
+original             0.846     0.938               0.938                0.905
+dosis ×1/2           0.842     0.909               0.909                0.908
+dosis ×1/4           0.842     0.891               0.891                0.867
+dosis ×1/10          0.822     0.837               0.837                0.832
+dosis ×1/20          0.821     0.820               0.820                0.807
+JPEG q50             0.843     0.893               0.893                0.885
+JPEG q25             0.840     0.862               0.862                0.843
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/07_baja_dosis_anclaje_hibrido_se6.png
+
+[07 híbrido con el σe² estimado en LIDC: OK, 8.5 min]
+
+======================================================================
+07 híbrido con el límite superior del IC 95 % de σe²
+  python scripts/07_baja_dosis.py --anclaje hibrido --sigma-e2 lidc_sup
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Ruido electrónico por lectura: 33.7 (en lugar de 30)
+Simulando 217 nódulos × 7 condiciones (T = -475 HU, cierre 20 mm) con 7 procesos...
+  constante del tubo: 07a (calibrado con LIDC); ruido electrónico: sí
+  20/217
+  40/217
+  60/217
+  80/217
+  100/217
+  120/217
+  140/217
+  160/217
+  180/217
+  200/217
+  217/217
+
+Población: 112 nódulos de entrenamiento {'benigno': 56, 'sospechoso': 56}
+
+== a. Segmentación en cada condición ==
+             ruido_agregado_hu  ruido_total_pulmon_hu  mas_equivalente    n  frac_calcio_media  dice_medio  aceptables
+condicion                                                                                                             
+original                 0.000                 17.021            240.0  112              0.153       0.892       1.000
+dosis ×1/2              19.628                 25.823            120.0  112              0.155       0.888       0.955
+dosis ×1/4              40.387                 43.592             60.0  112              0.165       0.877       0.893
+dosis ×1/10            102.338                103.881             24.0  112              0.197       0.836       0.741
+dosis ×1/20            193.851                194.557             12.0  112              0.266       0.772       0.536
+JPEG q50                16.514                    NaN              NaN  112              0.140       0.890       0.964
+JPEG q25                23.974                    NaN              NaN  112              0.134       0.886       0.938
+
+== b. Reproducibilidad (CCC de Lin vs original; ≥ 0,9 robusta, < 0,7 frágil) ==
+                                    dosis ×1/2  dosis ×1/4  dosis ×1/10  dosis ×1/20  JPEG q50  JPEG q25
+medida                                                                                                  
+hu_media                                  1.00        0.99         0.95         0.88      0.60      0.57
+hu_desvio                                 1.00        0.99         0.92         0.77      0.37      0.36
+frac_calcio                               1.00        0.98         0.89         0.72      0.98      0.97
+nitidez_borde_hu_mm                       1.00        0.97         0.87         0.68      0.74      0.72
+glcm_cluster_shade                        0.98        0.96         0.85         0.77      0.98      0.93
+glcm_energia                              0.98        0.93         0.84         0.74      0.92      0.88
+frac_contacto_no_pulmon                   0.99        0.91         0.80         0.57      0.99      0.99
+glcm_cluster_prominence                   0.98        0.93         0.71         0.49      0.98      0.94
+glcm_entropia                             0.96        0.87         0.69         0.51      0.87      0.82
+anillo_int_hu_media                       0.99        0.92         0.68         0.34      1.00      0.99
+glcm_correlacion                          0.97        0.90         0.68         0.50      0.97      0.94
+excentricidad                             0.97        0.94         0.67         0.46      0.97      0.97
+glcm_homogeneidad                         0.96        0.86         0.66         0.53      0.92      0.87
+anillo_ext_hu_media                       0.99        0.94         0.65         0.23      1.00      0.99
+diametro_eq_mm                            1.00        0.83         0.63         0.45      1.00      1.00
+hu_asimetria                              0.98        0.91         0.57         0.23      0.69      0.69
+anillo_ext_glcm_correlacion               0.94        0.80         0.57         0.44      0.98      0.93
+anillo_ext_glcm_cluster_shade             0.98        0.90         0.56         0.28      0.99      0.99
+frac_fina                                 0.96        0.90         0.54         0.30      0.94      0.95
+anillo_int_glcm_correlacion               0.92        0.77         0.53         0.37      0.97      0.93
+hu_curtosis                               0.98        0.85         0.52         0.41      0.80      0.79
+circularidad                              0.98        0.85         0.48         0.31      0.95      0.95
+anillo_int_glcm_energia                   0.91        0.71         0.46         0.30      0.94      0.83
+anillo_ext_glcm_cluster_prominence        0.98        0.88         0.43         0.16      0.99      0.99
+solidez                                   0.98        0.88         0.43         0.28      0.95      0.93
+glcm_contraste                            0.98        0.86         0.40         0.19      0.98      0.96
+anillo_ext_glcm_entropia                  0.89        0.66         0.37         0.22      0.98      0.95
+n_estructuras_convergentes                0.73        0.67         0.36         0.28      0.71      0.76
+circularidad_cruda                        0.91        0.79         0.36         0.24      0.97      0.97
+anillo_int_glcm_entropia                  0.89        0.69         0.36         0.22      0.96      0.88
+anillo_ext_glcm_homogeneidad              0.85        0.61         0.34         0.21      0.98      0.93
+solidez_cruda                             0.91        0.75         0.33         0.19      0.94      0.95
+anillo_int_glcm_homogeneidad              0.85        0.63         0.33         0.21      0.94      0.85
+anillo_ext_glcm_energia                   0.87        0.61         0.32         0.25      0.96      0.89
+anillo_int_frac_denso                     0.89        0.80         0.30         0.17      0.95      0.72
+anillo_ext_hu_desvio                      0.94        0.74         0.29         0.11      0.99      0.98
+convergentes_por_10mm_borde               0.38        0.39         0.26         0.10      0.60      0.42
+area_mm2                                  1.00        0.62         0.24         0.13      1.00      1.00
+anillo_ext_frac_denso                     0.90        0.65         0.24         0.07      0.96      0.92
+anillo_int_glcm_cluster_shade             0.91        0.54         0.20         0.03      0.98      0.93
+anillo_int_hu_desvio                      0.87        0.65         0.16         0.07      0.98      0.95
+esqueleto_mm_por_mm_borde                 0.70        0.52         0.15         0.01      0.86      0.67
+anillo_int_glcm_contraste                 0.79        0.49         0.12         0.06      0.98      0.95
+anillo_ext_glcm_contraste                 0.80        0.40         0.11         0.05      0.99      0.97
+anillo_int_glcm_cluster_prominence        0.87        0.49         0.11         0.04      0.98      0.94
+frac_aire                                 1.00        0.00         0.00         0.00      1.00      0.77
+
+== c. AUC (validación cruzada por paciente) ==
+   re-armado = armado y evaluado con esa dosis; transferido = armado con la original
+TRANSFERIDO      diámetro solo  interior  interior + entorno  interior sin tamaño
+condicion                                                                    
+original             0.846     0.938               0.938                0.905
+dosis ×1/2           0.841     0.932               0.932                0.903
+dosis ×1/4           0.823     0.874               0.874                0.867
+dosis ×1/10          0.798     0.760               0.760                0.749
+dosis ×1/20          0.759     0.701               0.701                0.650
+JPEG q50             0.843     0.922               0.922                0.896
+JPEG q25             0.840     0.908               0.908                0.881
+RE-ARMADO      diámetro solo  interior  interior + entorno  interior sin tamaño
+condicion                                                                    
+original             0.846     0.938               0.938                0.905
+dosis ×1/2           0.841     0.904               0.904                0.903
+dosis ×1/4           0.823     0.853               0.853                0.848
+dosis ×1/10          0.798     0.774               0.769                0.722
+dosis ×1/20          0.761     0.721               0.765                0.759
+JPEG q50             0.843     0.893               0.893                0.885
+JPEG q25             0.840     0.862               0.862                0.843
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/07_baja_dosis_anclaje_hibrido_se33.7.png
+
+[07 híbrido con el límite superior del IC 95 % de σe²: OK, 9.8 min]
+
+Listo (0.4 h). Todo quedó en /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/resultados/log_baja_dosis.txt
