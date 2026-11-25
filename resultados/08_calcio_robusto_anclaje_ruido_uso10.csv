@@ -1,0 +1,6 @@
+condicion,sin calcio: calcio falso medio (umbral simple),sin calcio: calcio falso medio (robusto),sin calcio: % que parece calcificado (umbral simple),sin calcio: % que parece calcificado (robusto),calcificados: % detectado (umbral simple),calcificados: % detectado (robusto),n sin / con calcio
+original,0.0001224739742804648,0.0,0.0,0.0,100.0,90.2439024390244,71 / 41
+dosis ×1/2,0.00043979827930902673,0.0,0.0,0.0,100.0,87.8048780487805,71 / 41
+dosis ×1/4,0.0022847349705258434,0.0,4.225352112676056,0.0,100.0,90.2439024390244,71 / 41
+dosis ×1/10,0.008357785383391835,0.0,12.676056338028168,0.0,97.5609756097561,90.2439024390244,71 / 41
+dosis ×1/20,0.02032823787425416,0.001452504417776966,22.535211267605636,4.225352112676056,100.0,95.1219512195122,71 / 41
