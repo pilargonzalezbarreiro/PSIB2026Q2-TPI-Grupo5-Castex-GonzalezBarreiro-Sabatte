@@ -42,6 +42,7 @@ No hace falta instalar un numpy viejo para pylidc: `tpi/compat.py` recrea los al
 | 12 | `python scripts/12_dice_vs_cada_radiologo.py` | Dice contra CADA radiólogo (comparación justa) y cuántos nódulos son aceptables con ese criterio | Cortes |
 | 13 | `python scripts/13_puntaje_robusto_estricto.py [--anclaje hibrido --sigma-e2 lidc]` | Puntaje robusto con TODA la selección (también el CCC) dentro de cada pliegue | No |
 | 14 | `python scripts/14_figura_nitidez_borde.py` | Figura que explica cómo se mide la nitidez del borde | Cortes |
+| 15 | `python scripts/15_calcio_informe.py` | Calcio para el informe: especificidad y sensibilidad, AUC, boxplot de tres grupos con Holm, AUC del diámetro por estrato (A5), Spearman parcial con tamaño y calcio como covariables (A6) y umbral de fracción 0-10 % (A7) | No |
 
 ## Interfaz gráfica
 
@@ -105,7 +106,7 @@ tpi/                    módulos (cada uno explica en su docstring el porqué de
   visualizacion.py      figuras
   baja_dosis.py         simulación de baja dosis (Naziroglu et al. 2017): sinograma virtual, bowtie, compensación, ruido electrónico, FBP del ruido
   encabezados.py        parámetros de adquisición del DICOM, familia de kernel, bowtie por equipo
-scripts/                pipeline principal, 01 … 08, y del 09 al 14 (calcio, adquisición, Dice justo, nitidez del borde)
+scripts/                pipeline principal, 01 … 08, y del 09 al 15 (calcio, adquisición, Dice justo, nitidez del borde, tablas del calcio)
 comparaciones/          una pregunta de "¿qué método conviene?" o "¿cuánto error mete?" por archivo
 interfaz/app.py         interfaz gráfica (se abre con abrir_interfaz.py)
 correr_baja_dosis.py    corre la parte de baja dosis con ▶, sin comandos
