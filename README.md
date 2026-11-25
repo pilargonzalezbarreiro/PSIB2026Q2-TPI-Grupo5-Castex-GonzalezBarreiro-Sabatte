@@ -28,18 +28,27 @@ No hace falta instalar un numpy viejo para pylidc: `tpi/compat.py` recrea los al
 | 4 | `python scripts/04_caracteristicas.py --ajustar` | Análisis de histogramas, segmentación, validación (umbral de aceptabilidad), medidas de interior y entorno | Sí |
 | 1b | `python scripts/01_seleccionar_nodulos.py --ampliar-tamano 8 16` | Agrega a la muestra los nódulos elegibles de 8 a 16 mm (control por tamaño) | No |
 | 2–3 | `python scripts/02_descargar_dicom.py` y `python scripts/03_extraer_cortes.py --borrar-dicom` | Bajan solo lo que falta extraer; `--borrar-dicom` borra cada tomografía apenas se extraen sus nódulos | — |
+| 3b | `python scripts/03b_encabezados_dicom.py [--descargar --borrar-dicom]` | Parámetros de adquisición de cada corte (fabricante, kVp, mA, mAs, kernel, espesor, CTDIvol): describen la muestra y anclan la simulación de dosis. Solo lee encabezados; `--descargar` vuelve a bajar las series ya borradas | — |
 | 5 | `python scripts/05_estadistica.py` | Medida por medida: boxplots, Mann-Whitney + AUC + Holm, control por tamaño (estratos y Spearman parcial). Por defecto solo entrenamiento | Sí |
 | 5b / 6b | `... 05_estadistica.py --rango 8 16` y `... 06_puntaje.py --rango 8 16` | Lo mismo, solo con nódulos de tamaño parecido (8–16 mm) | Sí |
 | 6 | `python scripts/06_puntaje.py` | Puntaje que combina las mejores medidas: diámetro solo vs interior vs interior + entorno, con validación cruzada por paciente y curvas ROC. `--evaluar` usa el 20 % de evaluación (una sola vez, al final) | Sí |
 | 6c | `... 05_estadistica.py --sin-calcio` y `... 06_puntaje.py --sin-calcio` | Solo nódulos sin calcio: la pregunta clínica abierta (el calcio ya lo usan los radiólogos) | Sí |
-| 7 | `python scripts/07_baja_dosis.py` | ¿Los biomarcadores sobreviven a la baja dosis (tamizaje) y a la compresión? Re-adquiere cada corte en una tomografía simulada, corre todo el pipeline y mide segmentación, reproducibilidad (CCC) y AUC re-armado vs transferido. Lento (~15-30 min); después `--solo-analisis` | Sí |
+| 7a | `python scripts/07a_calibrar_dosis.py` | Calibra la constante del tubo (fotones por mAs) con el ruido de los propios estudios de LIDC y la **valida** prediciendo el ruido de los estudios de LIDC que ya son de baja dosis, con y sin ruido electrónico | Sí |
+| 7 | `python scripts/07_baja_dosis.py --anclaje mas`, después `--anclaje ruido` y `--anclaje hibrido` | ¿Los biomarcadores sobreviven a la baja dosis (tamizaje) y a la compresión? Lleva cada corte a ½, ¼, 1/10 y 1/20 de la dosis **de su estudio** con el método de Naziroglu et al. (2017): anclaje al mAs del DICOM, compensación del ruido que la imagen ya trae, ruido electrónico, FBP solo del ruido con la ventana del kernel del equipo. Corre todo el pipeline y mide segmentación, reproducibilidad (CCC) y AUC re-armado vs transferido. Lento; después `--solo-analisis` | Sí |
 | 8 (plus) | `python scripts/08_propuesta.py` | Propuesta: cuánto ruido aguanta cada medida (CCC e ICC), un puntaje que solo usa medidas robustas y que separan, y un calcio robusto al ruido (mediana + etiquetado + área mínima). Lee los resultados del 07, no cambia nada del pipeline | Sí |
+
+## Baja dosis, todo junto (sin comandos)
+
+Abrir `correr_baja_dosis.py` y apretar ▶. Por defecto corre 03b, el test y el 07a, y para (`HASTA = "07a"`). Después de revisar el log (`resultados/log_baja_dosis.txt`), cambiar a `HASTA = "todo"` para correr el análisis de incertidumbre, el 07 con los tres anclajes, la comparación y el 08.
 
 ## Comparaciones (independientes, en cualquier orden salvo la primera)
 
 | Script | Pregunta | Tiempo |
 |---|---|---|
-| `python comparaciones/reconstruccion.py --casos 3` | ¿Qué método de reconstrucción conviene con baja dosis o pocos ángulos? (SBP, FBP rampa/Hann, SART). **Guarda las reconstrucciones** para los dos de abajo | lento (~30 s por caso) |
+| `python comparaciones/reconstruccion.py --casos 3` | ¿Qué método de reconstrucción conviene con mucho ruido o pocos ángulos? (SBP, FBP rampa/Hann, SART). Acá los I0 son nominales: compara MÉTODOS sobre la misma adquisición simulada, no simula fracciones de dosis (eso es el 07). **Guarda las reconstrucciones** para los dos de abajo | lento (~30 s por caso) |
+| `python comparaciones/sensibilidad_dosis.py [--carpeta datos/cortes --casos 3]` | ¿Cuánto error mete elegir mal la constante del tubo (Φ) y el bowtie? Fórmula + simulación para Φ; barrido de 49 bowties calibrando como el pipeline; estimación del bowtie desde el perfil del ruido. Sin `--carpeta` usa el fantoma (verdad conocida) | ~3-4 min por caso |
+| `python comparaciones/incertidumbre_dosis.py [--carpeta datos/cortes --casos 3]` (por defecto, los tres anclajes) | Intervalo de confianza de la dosis real de cada etiqueta, propagando el rango plausible de TODOS los parámetros que no se pueden medir (bowtie de Kramer, ruido electrónico, kernel, Φ, geometría...). Tornado (uno por vez) + Monte Carlo (todos a la vez) + % de la variabilidad que explica cada uno | ~5 min por caso |
+| `python comparaciones/comparar_anclajes.py` | Después de correr el 07 con y sin `--anclaje ruido`: ¿cambian las conclusiones (CCC, AUC) según cómo se anclan los fotones? | segundos |
 | `python comparaciones/filtros.py --casos 3` | ¿Qué filtro limpia mejor la baja dosis? Mediana, gaussiano y Wiener en varios tamaños: ruido que queda vs nitidez del borde | segundos |
 | `python comparaciones/robustez.py --casos 3` | ¿Cuánto cambian la intensidad y la textura del nódulo con cada reconstrucción, filtro y JPEG? | segundos |
 | `python comparaciones/compresion.py` | ¿Cómo guardar o enviar? Huffman, RLE, PNG, JPEG: tamaño y pérdida | segundos |
