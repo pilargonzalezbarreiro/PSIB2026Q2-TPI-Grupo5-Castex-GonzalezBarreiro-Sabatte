@@ -1,0 +1,8 @@
+conjunto,n,dice_medio_vs_consenso,dice_medio_vs_cada_radiologo,concordancia_media_radiologos,aceptables_original,aceptables_justo,dejan_de_ser_aceptables,pasan_a_aceptables
+todos,217,0.831,0.8,0.835,137,110,29.0,2.0
+entrenamiento,165,0.837,0.804,0.831,112,92,21.0,1.0
+evaluacion,52,0.813,0.787,0.848,25,18,8.0,1.0
+entrenamiento/benigno,85,,,,56,44,,
+entrenamiento/sospechoso,80,,,,56,48,,
+evaluacion/benigno,24,,,,8,7,,
+evaluacion/sospechoso,28,,,,17,11,,

@@ -1,0 +1,4 @@
+umbral_hu,frac_max,n_total,con_calcio_benig,con_calcio_sosp,n_sin_calcio,sin_calcio_sosp,sin_calcio_benig,auc_diametro_eq_mm,mayor_en_diametro_eq_mm,auc_glcm_contraste,mayor_en_glcm_contraste,auc_hu_asimetria,mayor_en_hu_asimetria,auc_nitidez_borde_hu_mm,mayor_en_nitidez_borde_hu_mm
+130,0.02,112,35,14,63,42,21,0.931,sospechoso,0.743,benigno,0.747,benigno,0.55,benigno
+200,0.02,112,34,7,71,49,22,0.939,sospechoso,0.695,benigno,0.766,benigno,0.51,benigno
+300,0.02,112,32,4,76,52,24,0.942,sospechoso,0.712,benigno,0.75,benigno,0.531,benigno
