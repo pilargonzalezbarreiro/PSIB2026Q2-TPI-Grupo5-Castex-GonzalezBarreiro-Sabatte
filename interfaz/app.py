@@ -722,14 +722,21 @@ if etapa == ETAPAS[6]:
 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Ruido agregado", f"{agregado:.0f} HU")
+    dd = dice(seg_c, d["consenso"]) - dice(seg_o, d["consenso"])
     c2.metric("Dice vs consenso", f"{dice(seg_c, d['consenso']):.3f}",
-              f"{dice(seg_c, d['consenso']) - dice(seg_o, d['consenso']):+.3f}")
+              f"{dd:+.3f}" if abs(dd) >= 0.0005 else "sin cambio", delta_color="normal" if abs(dd) >= 0.0005 else "off",
+              help="Abajo, el cambio respecto de la imagen original")
     if f_o and f_c:
-        c3.metric("Calcio, umbral simple", f"{100 * f_c['frac_calcio']:.1f} %",
-                  f"{100 * (f_c['frac_calcio'] - f_o['frac_calcio']):+.1f} pp", delta_color="inverse")
-        c4.metric("Calcio, medida robusta", f"{100 * f_c['frac_calcio_robusto']:.1f} %",
-                  f"{100 * (f_c['frac_calcio_robusto'] - f_o['frac_calcio_robusto']):+.1f} pp",
-                  delta_color="inverse")
+        def cambio_pp(k):
+            dif = 100 * (f_c[k] - f_o[k])
+            return (f"{dif:+.1f} pp", "inverse") if abs(dif) >= 0.05 else ("sin cambio", "off")
+
+        for col, k, nombre in ((c3, "frac_calcio", "Calcio, umbral simple"),
+                               (c4, "frac_calcio_robusto", "Calcio, medida robusta")):
+            txt, color = cambio_pp(k)
+            col.metric(nombre, f"{100 * f_c[k]:.1f} %", txt, delta_color=color,
+                       help="Fracción del área del nódulo por encima de 200 HU; abajo, el cambio respecto de la "
+                            "imagen original, en puntos porcentuales")
         tabla = pd.DataFrame([{"medida": NOMBRES.get(k, k), "original": f_o[k], cond: f_c.get(k, np.nan),
                                "cambio %": 100 * (f_c.get(k, np.nan) - f_o[k]) / abs(f_o[k]) if f_o[k] else np.nan}
                               for k in NOMBRES if k in f_o])
