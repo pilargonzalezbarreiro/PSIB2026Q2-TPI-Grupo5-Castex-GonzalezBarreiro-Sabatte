@@ -35,11 +35,30 @@ No hace falta instalar un numpy viejo para pylidc: `tpi/compat.py` recrea los al
 | 6c | `... 05_estadistica.py --sin-calcio` y `... 06_puntaje.py --sin-calcio` | Solo nódulos sin calcio: la pregunta clínica abierta (el calcio ya lo usan los radiólogos) | Sí |
 | 7a | `python scripts/07a_calibrar_dosis.py` | Calibra la constante del tubo (fotones por mAs) con el ruido de los propios estudios de LIDC y la **valida** prediciendo el ruido de los estudios de LIDC que ya son de baja dosis, con y sin ruido electrónico | Sí |
 | 7 | `python scripts/07_baja_dosis.py --anclaje mas`, después `--anclaje ruido` y `--anclaje hibrido` | ¿Los biomarcadores sobreviven a la baja dosis (tamizaje) y a la compresión? Lleva cada corte a ½, ¼, 1/10 y 1/20 de la dosis **de su estudio** con el método de Naziroglu et al. (2017): anclaje al mAs del DICOM, compensación del ruido que la imagen ya trae, ruido electrónico, FBP solo del ruido con la ventana del kernel del equipo. Corre todo el pipeline y mide segmentación, reproducibilidad (CCC) y AUC re-armado vs transferido. Lento; después `--solo-analisis` | Sí |
-| 8 (plus) | `python scripts/08_propuesta.py` | Propuesta: cuánto ruido aguanta cada medida (CCC e ICC), un puntaje que solo usa medidas robustas y que separan, y un calcio robusto al ruido (mediana + etiquetado + área mínima). Lee los resultados del 07, no cambia nada del pipeline | Sí |
+| 8 (plus) | `python scripts/08_propuesta.py [--anclaje hibrido --sigma-e2 lidc] [--dosis-uso 4\|10]` | Propuesta: cuánto ruido aguanta cada medida (CCC e ICC), un puntaje que solo usa medidas robustas y que separan, y un calcio robusto al ruido (mediana + etiquetado + área mínima). Lee los resultados del 07, no cambia nada del pipeline | Sí |
+| 9 | `python scripts/09_sensibilidad_umbral_calcio.py` | Calcio: ¿cambia algo con umbrales de 130, 200 y 300 HU? | Cortes |
+| 10 | `python scripts/10_sin_pixeles_calcio.py` | Calcio: textura e histograma recalculados SIN los píxeles calcificados (sin descartar nódulos) | Cortes |
+| 11 | `python scripts/11_parametros_dicom.py` | Tabla de parámetros de adquisición (kVp, corriente, kernel, espesor, equipo) en total y por grupo, desde `encabezados_dicom.csv` | No |
+| 12 | `python scripts/12_dice_vs_cada_radiologo.py` | Dice contra CADA radiólogo (comparación justa) y cuántos nódulos son aceptables con ese criterio | Cortes |
+| 13 | `python scripts/13_puntaje_robusto_estricto.py [--anclaje hibrido --sigma-e2 lidc]` | Puntaje robusto con TODA la selección (también el CCC) dentro de cada pliegue | No |
+| 14 | `python scripts/14_figura_nitidez_borde.py` | Figura que explica cómo se mide la nitidez del borde | Cortes |
+
+## Interfaz gráfica
+
+Abrir `abrir_interfaz.py` y apretar ▶ (la primera vez instala Streamlit). Se abre en el navegador una página que recorre el trabajo completo sobre el nódulo que se elija, con las mismas funciones del pipeline: **1** imagen, histograma y ruido; **2** reconstrucción (sinograma, SBP, FBP rampa/Hann, SART, con menos proyecciones o menos fotones); **3** filtros (mediana, gaussiano, Wiener) sobre una imagen de baja dosis; **4** segmentación paso a paso, con Dice contra el consenso y contra cada radiólogo y Otsu; **5** características (forma, borde, calcio, histograma, GLCM, entorno) comparadas con los dos grupos; **6** el puntaje del 06 armado sin el paciente de ese nódulo; **7** baja dosis (Naziroglu, con los tres escenarios de ruido electrónico) y JPEG, con el cambio de cada medida y del puntaje; **8** las figuras globales. Necesita `datos/cortes/` y `resultados/`. El código está en `interfaz/app.py`.
 
 ## Baja dosis, todo junto (sin comandos)
 
-Abrir `correr_baja_dosis.py` y apretar ▶. Por defecto corre 03b, el test y el 07a, y para (`HASTA = "07a"`). Después de revisar el log (`resultados/log_baja_dosis.txt`), cambiar a `HASTA = "todo"` para correr el análisis de incertidumbre, el 07 con los tres anclajes, la comparación y el 08.
+Abrir `correr_baja_dosis.py`, elegir `HASTA` y apretar ▶. Todo queda en `resultados/log_baja_dosis.txt`:
+
+| `HASTA` | Qué corre |
+|---|---|
+| `"07a"` | 03b, el test en el fantoma y la calibración 07a |
+| `"todo"` | 07 con los tres anclajes, comparación de anclajes, 08 e incertidumbre (varias horas; retoma si se corta) |
+| `"resto"` | 08 con dosis de uso ×1/10 e incertidumbre acotada |
+| `"electronico"` | 07a con la estimación del ruido electrónico en LIDC y el 07 híbrido con ese valor (σe² = 6) y con el límite superior de su intervalo (34) |
+| `"final"` | 08, 11 y 13 con el resultado principal (híbrido, σe² de LIDC) |
+| `"control"` | AUC con los 112 nódulos aceptables (criterio original) y con los 92 del criterio justo (script 12) |
 
 ## Comparaciones (independientes, en cualquier orden salvo la primera)
 
@@ -48,6 +67,7 @@ Abrir `correr_baja_dosis.py` y apretar ▶. Por defecto corre 03b, el test y el 
 | `python comparaciones/reconstruccion.py --casos 3` | ¿Qué método de reconstrucción conviene con mucho ruido o pocos ángulos? (SBP, FBP rampa/Hann, SART). Acá los I0 son nominales: compara MÉTODOS sobre la misma adquisición simulada, no simula fracciones de dosis (eso es el 07). **Guarda las reconstrucciones** para los dos de abajo | lento (~30 s por caso) |
 | `python comparaciones/sensibilidad_dosis.py [--carpeta datos/cortes --casos 3]` | ¿Cuánto error mete elegir mal la constante del tubo (Φ) y el bowtie? Fórmula + simulación para Φ; barrido de 49 bowties calibrando como el pipeline; estimación del bowtie desde el perfil del ruido. Sin `--carpeta` usa el fantoma (verdad conocida) | ~3-4 min por caso |
 | `python comparaciones/incertidumbre_dosis.py [--carpeta datos/cortes --casos 3]` (por defecto, los tres anclajes) | Intervalo de confianza de la dosis real de cada etiqueta, propagando el rango plausible de TODOS los parámetros que no se pueden medir (bowtie de Kramer, ruido electrónico, kernel, Φ, geometría...). Tornado (uno por vez) + Monte Carlo (todos a la vez) + % de la variabilidad que explica cada uno | ~5 min por caso |
+| `python comparaciones/sensibilidad_aceptables.py` | ¿Cambian los AUC principales si se usa el criterio justo de aceptabilidad (92 nódulos en vez de 112)? | ~1 min |
 | `python comparaciones/comparar_anclajes.py` | Después de correr el 07 con y sin `--anclaje ruido`: ¿cambian las conclusiones (CCC, AUC) según cómo se anclan los fotones? | segundos |
 | `python comparaciones/filtros.py --casos 3` | ¿Qué filtro limpia mejor la baja dosis? Mediana, gaussiano y Wiener en varios tamaños: ruido que queda vs nitidez del borde | segundos |
 | `python comparaciones/robustez.py --casos 3` | ¿Cuánto cambian la intensidad y la textura del nódulo con cada reconstrucción, filtro y JPEG? | segundos |
@@ -83,9 +103,14 @@ tpi/                    módulos (cada uno explica en su docstring el porqué de
   estadistica.py        Mann-Whitney, AUC, Holm, estratos por tamaño, Spearman parcial
   puntaje.py            puntaje combinado, validación cruzada por paciente, ROC
   visualizacion.py      figuras
-scripts/                pipeline principal, 01 … 06
-comparaciones/          una pregunta de "¿qué método conviene?" por archivo
+  baja_dosis.py         simulación de baja dosis (Naziroglu et al. 2017): sinograma virtual, bowtie, compensación, ruido electrónico, FBP del ruido
+  encabezados.py        parámetros de adquisición del DICOM, familia de kernel, bowtie por equipo
+scripts/                pipeline principal, 01 … 08, y del 09 al 14 (calcio, adquisición, Dice justo, nitidez del borde)
+comparaciones/          una pregunta de "¿qué método conviene?" o "¿cuánto error mete?" por archivo
+interfaz/app.py         interfaz gráfica (se abre con abrir_interfaz.py)
+correr_baja_dosis.py    corre la parte de baja dosis con ▶, sin comandos
 tests/test_fantoma.py   fantoma sintético para verificar el código
+tests/test_baja_dosis.py  verificación de la simulación de dosis en un fantoma
 ```
 
 ## Dataset

@@ -8,3 +8,4 @@ Pillow
 pylidc
 idc-index
 ipykernel
+streamlit
