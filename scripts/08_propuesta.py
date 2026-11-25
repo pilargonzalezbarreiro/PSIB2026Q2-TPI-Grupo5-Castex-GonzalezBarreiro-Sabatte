@@ -58,12 +58,15 @@ E7 = importlib.util.module_from_spec(_spec)
 _spec.loader.exec_module(E7)
 
 CLAVES = ["paciente", "scan_id", "nodulo"]
-DOSIS = ["FBP sin ruido", "dosis ×1", "dosis ×1/4", "dosis ×1/10", "dosis ×1/20"]
+# Fracciones de la dosis DE CADA ESTUDIO (07, método de Naziroglu et al. 2017)
+DOSIS = [E7._etiqueta(f) for f in C.FRACCIONES_DOSIS]
 # Un tamizaje de baja dosis usa del orden de 1/4 de la dosis de una tomografía
 # diagnóstica: es la dosis "de uso" para decidir qué medidas son aceptables.
+# Con la simulación nueva "×1/4" ES un cuarto de la dosis del estudio (antes,
+# sin compensar ni anclar, la etiqueta subestimaba la reducción real).
 DOSIS_USO = "dosis ×1/4"
 UMBRAL_REPRO = 0.9
-NO_MEDIDAS = {"ruido_hu", "ruido_agregado_hu", "scan_id", "nodulo", "frac_calcio_robusto"}
+NO_MEDIDAS = E7.COLUMNAS_SIMULACION
 
 
 def icc_acuerdo(x, y):
@@ -160,7 +163,7 @@ def puntaje_robusto(df, medidas, robustas, k=5):
     y = (base.grupo == "sospechoso").to_numpy(int)
     pac = base.paciente.to_numpy()
     filas = []
-    for cond in ["original"] + DOSIS[1:]:
+    for cond in ["original"] + DOSIS:
         _, otra = tabla(df, cond)
         otra = otra.reset_index()
         for nombre, (cols, kk) in conjuntos.items():
@@ -175,7 +178,7 @@ def calcio(df):
     if "frac_calcio_robusto" not in df or df["frac_calcio_robusto"].isna().all():
         return None
     filas = []
-    for cond in ["original"] + DOSIS[1:]:
+    for cond in ["original"] + DOSIS:
         sub = df[df.condicion == cond]
         sin = sub[sub.calcio_original <= C.FRAC_CALCIO_MAX]
         con = sub[sub.calcio_original > C.FRAC_CALCIO_MAX]
@@ -202,7 +205,8 @@ def analizar(df, sufijo, titulo):
     rt = ruido_tolerable(df, medidas)
     rt.to_csv(C.DIR_RESULTADOS / f"08_ruido_tolerable{sufijo}.csv", index=False)
     print(f"\n== 1. Cuánto ruido aguanta cada medida (CCC >= {UMBRAL_REPRO}); las 15 más robustas ==")
-    cols = ["medida", "ruido_tolerable_hu", f"CCC {DOSIS_USO}", f"ICC {DOSIS_USO}", "CCC dosis ×1/10"]
+    cols = list(dict.fromkeys(["medida", "ruido_tolerable_hu", f"CCC {DOSIS_USO}", f"ICC {DOSIS_USO}",
+                               "CCC dosis ×1/10"]))
     print(rt[cols].head(15).round(2).to_string(index=False))
 
     # 2
@@ -213,27 +217,49 @@ def analizar(df, sufijo, titulo):
     print("   ", ", ".join(conjuntos["interior robusto (propuesta)"][0]))
     print("   AUC transferido (armado con la original, aplicado a cada dosis):")
     tab = pr.pivot(index="condicion", columns="puntaje", values="auc_transferido")
-    print(tab.reindex(["original"] + DOSIS[1:])[list(conjuntos)].round(3).to_string())
+    print(tab.reindex(["original"] + DOSIS)[list(conjuntos)].round(3).to_string())
+    print("   mismo AUC con su IC 95 % (bootstrap por paciente):")
+    pr_ic = pr.assign(txt=[f"{a:.3f} [{lo:.2f}-{hi:.2f}]" for a, lo, hi in
+                           zip(pr.auc_transferido, pr.ic95_inf, pr.ic95_sup)])
+    tab_ic = pr_ic.pivot(index="condicion", columns="puntaje", values="txt")
+    print(tab_ic.reindex(["original"] + DOSIS)[list(conjuntos)].to_string())
     return rt, pr
 
 
 def main():
-    df = poblacion(pd.read_csv(C.DIR_RESULTADOS / "07_baja_dosis.csv"))
-    rt, pr = analizar(df, "", "TODOS")
+    import argparse
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--anclaje", choices=["mas", "ruido", "hibrido"], default="mas",
+                    help="qué corrida del 07 analizar (los resultados llevan ese sufijo)")
+    ap.add_argument("--dosis-uso", type=int, default=4,
+                    help="denominador de la dosis con la que se decide qué medida es robusta "
+                         "(4 = ×1/4, la de referencia; 10 = ×1/10, para ver cuánto depende de esta elección)")
+    args = ap.parse_args()
+    global DOSIS_USO
+    DOSIS_USO = f"dosis ×1/{args.dosis_uso}"
+    if DOSIS_USO not in DOSIS:
+        raise SystemExit(f"{DOSIS_USO} no está entre las condiciones simuladas: {DOSIS}")
+    a = {"mas": "", "ruido": "_anclaje_ruido", "hibrido": "_anclaje_hibrido"}[args.anclaje]
+    sufijo_uso = "" if args.dosis_uso == 4 else f"_uso{args.dosis_uso}"
+    print(f"Anclaje: {args.anclaje} (lee resultados/07_baja_dosis{a}.csv)")
+    df = poblacion(pd.read_csv(C.DIR_RESULTADOS / f"07_baja_dosis{a}.csv"))
+    print(f"Dosis de uso para decidir qué es robusto: {DOSIS_USO}")
+    a = a + sufijo_uso
+    rt, pr = analizar(df, a, "TODOS")
     sin = df[df.calcio_original <= C.FRAC_CALCIO_MAX]
-    rt2, pr2 = analizar(sin, "_sincalcio", "SIN CALCIO")
+    rt2, pr2 = analizar(sin, a + "_sincalcio", "SIN CALCIO")
 
     # 3
     ca = calcio(df)
     if ca is None:
         print("\n== 3. Calcio robusto: falta la columna frac_calcio_robusto -> correr de nuevo el 07 ==")
     else:
-        ca.to_csv(C.DIR_RESULTADOS / "08_calcio_robusto.csv", index=False)
+        ca.to_csv(C.DIR_RESULTADOS / f"08_calcio_robusto{a}.csv", index=False)
         print("\n== 3. Calcio robusto al ruido ==")
         print(ca.set_index("condicion").T.round(3).to_string())
 
-    figura(df, rt, pr, ca, "")
-    figura(sin, rt2, pr2, None, "_sincalcio")
+    figura(df, rt, pr, ca, a)
+    figura(sin, rt2, pr2, None, a + "_sincalcio")
 
 
 def figura(df, rt, pr, ca, sufijo):
@@ -245,7 +271,7 @@ def figura(df, rt, pr, ca, sufijo):
     ax[0].set_xlabel("ruido agregado tolerable (HU)")
     ax[0].tick_params(axis="y", labelsize=6)
     ax[0].set_title(f"1. Ruido con el que cada medida\nsigue siendo reproducible (CCC ≥ {UMBRAL_REPRO})")
-    orden = ["original"] + DOSIS[1:]
+    orden = ["original"] + DOSIS
     x = [0 if c == "original" else ruido[c] for c in orden]
     for nombre, sub in pr.groupby("puntaje", sort=False):
         sub = sub.set_index("condicion").reindex(orden)

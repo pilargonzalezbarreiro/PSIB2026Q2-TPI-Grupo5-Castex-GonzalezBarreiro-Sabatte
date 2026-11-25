@@ -65,8 +65,58 @@ HU_DENSO_ENTORNO = -500
 MU_AGUA = 0.02           # mm^-1 (aprox. a ~70 keV)
 N_ANGULOS_COMPLETO = 180
 N_ANGULOS_REDUCIDO = 60
-I0_REFERENCIA = 1e5
+I0_REFERENCIA = 1e5      # solo para comparaciones/reconstruccion.py (comparar MÉTODOS)
 I0_BAJA_DOSIS = (2.5e4, 1e4)
+
+# --- Simulación de baja dosis (tpi/baja_dosis.py, scripts 07a y 07) -------
+# Sigue a Naziroglu et al. (2017). Ver DECISIONES.md, "Simulación de baja
+# dosis". Todo lo que no está en el DICOM de LIDC sale de acá, y lo que más
+# pesa (FOTONES_POR_MAS_MM2) se calibra con la propia base en el 07a.
+N_VISTAS_DOSIS = 360          # vistas del sinograma virtual (en 180°, haz paralelo)
+# Fotones que llegan por mAs y por mm² en el isocentro (integrados en la
+# rotación, centro del bowtie, 120 kVp). Valor inicial del orden que da el
+# kerma en aire típico (~0,2 mGy/mAs a 120 kV) con ~3e7 fotones/(mm²·mGy) a
+# ~60 keV, menos filtrado y eficiencia del detector. El 07a lo reemplaza por
+# el valor calibrado con el ruido de los estudios de LIDC.
+FOTONES_POR_MAS_MM2 = 2e6
+EXPONENTE_KVP = 2.5           # rendimiento del tubo ∝ kVp^~2-2,5
+# Ruido electrónico (de lectura) en "fotones equivalentes" por lectura del
+# detector. Elhamiasl y Nuyts (2020) reportan ~29 para un equipo moderno; los
+# equipos de LIDC (1999-2004) probablemente tenían más. Se reporta con y sin.
+# El 07a lo estima con los propios datos de LIDC (07a_electronico.csv). Para
+# correr el 07 con otro valor: --sigma-e2 (lo pasa por la variable de entorno
+# TPI_SIGMA_E2, que heredan los procesos en paralelo).
+import os as _os
+SIGMA_E2_LECTURA = float(_os.environ.get("TPI_SIGMA_E2", 30.0))
+VISTAS_POR_ROTACION = 1000    # típico de los equipos de la época (no está en el DICOM)
+ANCHO_DETECTOR_ISO_MM = 0.6   # ancho de un canal proyectado al isocentro
+ANCHO_FILA_MM = 0.625         # ancho de una fila (si el DICOM no trae colimación)
+# Bowtie: transmisión relativa al rayo central. El perfil real de cada equipo
+# es información del fabricante y en LIDC no se puede medir (DECISIONES §6).
+# Modelo por defecto, "kramer": Kramer et al. (2017, Phys Med Biol 62:781) —
+# filtro de PMMA con espesor t(θ) sigmoide (Boltzmann), diseñado para un
+# fantoma de cuerpo de 32 cm, escalado por un "scanner filter factor" (SFF)
+# que ellos ajustaron para 11 tomógrafos con los CTDI publicados (sin datos del
+# fabricante). SFF por modelo: tpi/encabezados.py (SFF_BOWTIE_KRAMER).
+BOWTIE_MODELO = "kramer"
+BOWTIE_SFF = 1.01             # mediana de los 11 equipos (filtro de cuerpo), si el modelo no está en la tabla
+BOWTIE_SFF_RANGO = (0.66, 1.76)   # mínimo y máximo de los 11 equipos
+BOWTIE_DSI_MM = 570.0         # distancia fuente-isocentro (~540-600 mm según fabricante)
+MU_PMMA_MM = 0.0229           # μ del PMMA a ~60 keV (NIST: μ/ρ ≈ 0,192 cm²/g, ρ = 1,19 g/cm³)
+# Modelos alternativos (para sensibilidad): "cilindro" (compensa una fracción
+# del agua que le falta a un rayo lateral), "gauss" (campana) y "plano".
+BOWTIE_DIAMETRO_MM = 320.0
+BOWTIE_COMPENSACION = 0.5
+BOWTIE_MIN = 0.05
+BOWTIE_ANCHO_MM = 160.0
+CUENTAS_MIN = 1.0             # piso de cuentas antes del logaritmo (fotones)
+# Ruido de la imagen original: "ruido global" de Christianson et al. (2015):
+# moda del desvío local en tejido blando (sin estructura, a diferencia del
+# parénquima). Ventana local ~6 mm.
+HU_TEJIDO_BLANDO = (0, 100)
+LADO_RUIDO_LOCAL_MM = 6.0
+# Fracciones de la dosis DEL ESTUDIO que se simulan en el 07.
+FRACCIONES_DOSIS = (0.5, 0.25, 0.1, 0.05)
 
 # --- Compresión -----------------------------------------------------------
 VENTANA_8BIT = (-1000, 400)
