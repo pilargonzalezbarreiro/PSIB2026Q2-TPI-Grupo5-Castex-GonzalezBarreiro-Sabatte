@@ -2178,3 +2178,804 @@ JPEG q25             0.840     0.862               0.862                0.843
 [07 híbrido con el límite superior del IC 95 % de σe²: OK, 9.8 min]
 
 Listo (0.4 h). Todo quedó en /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/resultados/log_baja_dosis.txt
+
+######################################################################
+# ETAPA: final
+######################################################################
+
+======================================================================
+08 propuesta (híbrido, σe² de LIDC, dosis de uso ×1/4)
+  python scripts/08_propuesta.py --anclaje hibrido --sigma-e2 lidc --dosis-uso 4
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: hibrido (lee resultados/07_baja_dosis_anclaje_hibrido_se6.csv)
+Dosis de uso para decidir qué es robusto: dosis ×1/4
+
+################ TODOS: 112 nódulos {'benigno': 56, 'sospechoso': 56} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                       medida  ruido_tolerable_hu  CCC dosis ×1/4  ICC dosis ×1/4  CCC dosis ×1/10
+          nitidez_borde_hu_mm               99.96            1.00            1.00             0.98
+                    hu_desvio               99.96            1.00            1.00             0.99
+                  frac_calcio               99.96            1.00            1.00             0.97
+                     hu_media               99.96            1.00            1.00             0.99
+                 glcm_energia               57.85            0.96            0.96             0.90
+          anillo_ext_hu_media               57.85            0.99            0.99             0.93
+           glcm_cluster_shade               57.85            0.98            0.98             0.93
+          anillo_int_hu_media               57.85            0.98            0.99             0.95
+      glcm_cluster_prominence               57.85            0.97            0.97             0.90
+             glcm_correlacion               29.60            0.94            0.94             0.80
+                     area_mm2               29.60            1.00            1.00             0.23
+               glcm_contraste               29.60            0.97            0.97             0.73
+               diametro_eq_mm               29.60            1.00            1.00             0.65
+        anillo_ext_frac_denso               29.60            0.92            0.92             0.59
+anillo_ext_glcm_cluster_shade               29.60            0.95            0.95             0.80
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/4 (y AUC >= 0.7 al armar) ==
+    area_mm2, diametro_eq_mm, circularidad, solidez, excentricidad, circularidad_cruda, solidez_cruda, nitidez_borde_hu_mm, hu_media, hu_desvio, hu_asimetria, hu_curtosis, frac_calcio, glcm_energia, glcm_entropia, glcm_contraste, glcm_homogeneidad, glcm_correlacion, glcm_cluster_shade, glcm_cluster_prominence
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.846                     0.938                         0.938
+dosis ×1/2           0.842                     0.936                         0.936
+dosis ×1/4           0.841                     0.915                         0.915
+dosis ×1/10          0.822                     0.824                         0.824
+dosis ×1/20          0.822                     0.760                         0.760
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.846 [0.77-0.92]        0.938 [0.89-0.97]            0.938 [0.89-0.97]
+dosis ×1/2   0.842 [0.76-0.92]        0.936 [0.89-0.97]            0.936 [0.89-0.97]
+dosis ×1/4   0.841 [0.76-0.91]        0.915 [0.86-0.96]            0.915 [0.86-0.96]
+dosis ×1/10  0.822 [0.73-0.90]        0.824 [0.74-0.90]            0.824 [0.74-0.90]
+dosis ×1/20  0.822 [0.73-0.90]        0.760 [0.66-0.85]            0.760 [0.66-0.85]
+
+################ SIN CALCIO: 71 nódulos {'sospechoso': 49, 'benigno': 22} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                            medida  ruido_tolerable_hu  CCC dosis ×1/4  ICC dosis ×1/4  CCC dosis ×1/10
+                          area_mm2               96.54            1.00            1.00             1.00
+                    diametro_eq_mm               96.54            1.00            1.00             1.00
+           frac_contacto_no_pulmon               96.54            1.00            1.00             0.98
+                           solidez               56.80            0.96            0.96             0.90
+               nitidez_borde_hu_mm               56.80            0.99            0.99             0.93
+               anillo_ext_hu_media               56.80            0.99            0.99             0.95
+                          hu_media               56.80            0.99            0.99             0.95
+               anillo_int_hu_media               56.80            0.98            0.98             0.95
+                circularidad_cruda               56.80            0.96            0.96             0.91
+anillo_ext_glcm_cluster_prominence               28.57            0.95            0.95             0.64
+                     solidez_cruda               28.57            0.95            0.95             0.88
+                         hu_desvio               28.57            0.93            0.93             0.63
+                      hu_asimetria               28.57            0.94            0.94             0.73
+                       hu_curtosis               28.57            0.94            0.95             0.76
+                      circularidad               28.57            0.96            0.96             0.88
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/4 (y AUC >= 0.7 al armar) ==
+    area_mm2, diametro_eq_mm, circularidad, solidez, excentricidad, circularidad_cruda, solidez_cruda, nitidez_borde_hu_mm, hu_media, hu_desvio, hu_asimetria, hu_curtosis, glcm_correlacion, glcm_cluster_shade, glcm_cluster_prominence
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.936                     0.919                         0.910
+dosis ×1/2           0.930                     0.904                         0.888
+dosis ×1/4           0.932                     0.891                         0.881
+dosis ×1/10          0.931                     0.847                         0.864
+dosis ×1/20          0.928                     0.774                         0.776
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.936 [0.87-0.99]        0.919 [0.85-0.98]            0.910 [0.83-0.97]
+dosis ×1/2   0.930 [0.86-0.99]        0.904 [0.83-0.97]            0.888 [0.81-0.96]
+dosis ×1/4   0.932 [0.86-0.99]        0.891 [0.81-0.96]            0.881 [0.78-0.96]
+dosis ×1/10  0.931 [0.86-0.99]        0.847 [0.75-0.93]            0.864 [0.77-0.94]
+dosis ×1/20  0.928 [0.86-0.98]        0.774 [0.66-0.87]            0.776 [0.66-0.88]
+
+== 3. Calcio robusto al ruido ==
+condicion                                              original dosis ×1/2 dosis ×1/4 dosis ×1/10 dosis ×1/20
+sin calcio: calcio falso medio (umbral simple)         0.000122   0.000119   0.002998    0.016091    0.050705
+sin calcio: calcio falso medio (robusto)                    0.0        0.0        0.0    0.002627     0.01536
+sin calcio: % que parece calcificado (umbral simple)        0.0        0.0   5.633803    19.71831   45.070423
+sin calcio: % que parece calcificado (robusto)              0.0        0.0        0.0    7.042254   21.126761
+calcificados: % detectado (umbral simple)                 100.0      100.0      100.0   97.560976       100.0
+calcificados: % detectado (robusto)                   90.243902  90.243902  92.682927   95.121951   95.121951
+n sin / con calcio                                      71 / 41    71 / 41    71 / 41     71 / 41     71 / 41
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_hibrido_se6.png
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_hibrido_se6_sincalcio.png
+
+[08 propuesta (híbrido, σe² de LIDC, dosis de uso ×1/4): OK, 0.2 min]
+
+======================================================================
+08 propuesta (híbrido, σe² de LIDC, dosis de uso ×1/10)
+  python scripts/08_propuesta.py --anclaje hibrido --sigma-e2 lidc --dosis-uso 10
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: hibrido (lee resultados/07_baja_dosis_anclaje_hibrido_se6.csv)
+Dosis de uso para decidir qué es robusto: dosis ×1/10
+
+################ TODOS: 112 nódulos {'benigno': 56, 'sospechoso': 56} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                       medida  ruido_tolerable_hu  CCC dosis ×1/10  ICC dosis ×1/10
+          nitidez_borde_hu_mm               99.96             0.98             0.98
+                    hu_desvio               99.96             0.99             0.99
+                  frac_calcio               99.96             0.97             0.97
+                     hu_media               99.96             0.99             0.99
+                 glcm_energia               57.85             0.90             0.90
+          anillo_ext_hu_media               57.85             0.93             0.93
+           glcm_cluster_shade               57.85             0.93             0.93
+          anillo_int_hu_media               57.85             0.95             0.95
+      glcm_cluster_prominence               57.85             0.90             0.90
+             glcm_correlacion               29.60             0.80             0.80
+                     area_mm2               29.60             0.23             0.24
+               glcm_contraste               29.60             0.73             0.74
+               diametro_eq_mm               29.60             0.65             0.66
+        anillo_ext_frac_denso               29.60             0.59             0.60
+anillo_ext_glcm_cluster_shade               29.60             0.80             0.80
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/10 (y AUC >= 0.7 al armar) ==
+    nitidez_borde_hu_mm, hu_media, hu_desvio, frac_calcio, glcm_energia, glcm_cluster_shade, glcm_cluster_prominence
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.846                     0.938                         0.764
+dosis ×1/2           0.842                     0.936                         0.762
+dosis ×1/4           0.841                     0.915                         0.755
+dosis ×1/10          0.822                     0.824                         0.751
+dosis ×1/20          0.822                     0.760                         0.723
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.846 [0.77-0.92]        0.938 [0.89-0.97]            0.764 [0.67-0.85]
+dosis ×1/2   0.842 [0.76-0.92]        0.936 [0.89-0.97]            0.762 [0.67-0.85]
+dosis ×1/4   0.841 [0.76-0.91]        0.915 [0.86-0.96]            0.755 [0.66-0.84]
+dosis ×1/10  0.822 [0.73-0.90]        0.824 [0.74-0.90]            0.751 [0.65-0.84]
+dosis ×1/20  0.822 [0.73-0.90]        0.760 [0.66-0.85]            0.723 [0.62-0.82]
+
+################ SIN CALCIO: 71 nódulos {'sospechoso': 49, 'benigno': 22} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                            medida  ruido_tolerable_hu  CCC dosis ×1/10  ICC dosis ×1/10
+                          area_mm2               96.54             1.00             1.00
+                    diametro_eq_mm               96.54             1.00             1.00
+           frac_contacto_no_pulmon               96.54             0.98             0.98
+                           solidez               56.80             0.90             0.91
+               nitidez_borde_hu_mm               56.80             0.93             0.94
+               anillo_ext_hu_media               56.80             0.95             0.95
+                          hu_media               56.80             0.95             0.95
+               anillo_int_hu_media               56.80             0.95             0.95
+                circularidad_cruda               56.80             0.91             0.91
+anillo_ext_glcm_cluster_prominence               28.57             0.64             0.65
+                     solidez_cruda               28.57             0.88             0.88
+                         hu_desvio               28.57             0.63             0.63
+                      hu_asimetria               28.57             0.73             0.73
+                       hu_curtosis               28.57             0.76             0.76
+                      circularidad               28.57             0.88             0.88
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/10 (y AUC >= 0.7 al armar) ==
+    area_mm2, diametro_eq_mm, solidez, circularidad_cruda, frac_fina, nitidez_borde_hu_mm, hu_media
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.936                     0.919                         0.901
+dosis ×1/2           0.930                     0.904                         0.912
+dosis ×1/4           0.932                     0.891                         0.916
+dosis ×1/10          0.931                     0.847                         0.910
+dosis ×1/20          0.928                     0.774                         0.908
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.936 [0.87-0.99]        0.919 [0.85-0.98]            0.901 [0.82-0.97]
+dosis ×1/2   0.930 [0.86-0.99]        0.904 [0.83-0.97]            0.912 [0.84-0.97]
+dosis ×1/4   0.932 [0.86-0.99]        0.891 [0.81-0.96]            0.916 [0.84-0.97]
+dosis ×1/10  0.931 [0.86-0.99]        0.847 [0.75-0.93]            0.910 [0.83-0.97]
+dosis ×1/20  0.928 [0.86-0.98]        0.774 [0.66-0.87]            0.908 [0.81-0.97]
+
+== 3. Calcio robusto al ruido ==
+condicion                                              original dosis ×1/2 dosis ×1/4 dosis ×1/10 dosis ×1/20
+sin calcio: calcio falso medio (umbral simple)         0.000122   0.000119   0.002998    0.016091    0.050705
+sin calcio: calcio falso medio (robusto)                    0.0        0.0        0.0    0.002627     0.01536
+sin calcio: % que parece calcificado (umbral simple)        0.0        0.0   5.633803    19.71831   45.070423
+sin calcio: % que parece calcificado (robusto)              0.0        0.0        0.0    7.042254   21.126761
+calcificados: % detectado (umbral simple)                 100.0      100.0      100.0   97.560976       100.0
+calcificados: % detectado (robusto)                   90.243902  90.243902  92.682927   95.121951   95.121951
+n sin / con calcio                                      71 / 41    71 / 41    71 / 41     71 / 41     71 / 41
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_hibrido_se6_uso10.png
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_hibrido_se6_uso10_sincalcio.png
+
+[08 propuesta (híbrido, σe² de LIDC, dosis de uso ×1/10): OK, 0.2 min]
+
+======================================================================
+11 parámetros de adquisición
+  python scripts/11_parametros_dicom.py
+======================================================================
+Nódulos: 217 | estudios: 178
+     grupo   unidad      parametro   n  mediana  minimo  maximo             valor
+     todos estudios            kvp 178    120.0  120.00   140.0                  
+     todos estudios   corriente_ma 178    240.0   40.00   570.0                  
+     todos estudios     espesor_mm 178      1.5    0.60     2.5                  
+     todos estudios    ctdivol_mgy   0      NaN     NaN     NaN                  
+     todos estudios     fabricante 123      NaN     NaN     NaN                GE
+     todos estudios     fabricante  34      NaN     NaN     NaN           SIEMENS
+     todos estudios     fabricante  20      NaN     NaN     NaN           PHILIPS
+     todos estudios     fabricante   1      NaN     NaN     NaN           TOSHIBA
+     todos estudios         modelo  42      NaN     NaN     NaN      LightSpeed16
+     todos estudios         modelo  28      NaN     NaN     NaN  LightSpeed Ultra
+     todos estudios         modelo  20      NaN     NaN     NaN      Sensation 16
+     todos estudios         modelo  18      NaN     NaN     NaN   LightSpeed Plus
+     todos estudios         modelo  14      NaN     NaN     NaN    LightSpeed VCT
+     todos estudios         modelo  14      NaN     NaN     NaN LightSpeed Pro 16
+     todos estudios         modelo  14      NaN     NaN     NaN    Brilliance 16P
+     todos estudios         modelo  12      NaN     NaN     NaN      Sensation 64
+     todos estudios         modelo   6      NaN     NaN     NaN   LightSpeed QX/i
+     todos estudios         modelo   4      NaN     NaN     NaN     Brilliance 40
+     todos estudios         modelo   2      NaN     NaN     NaN     Brilliance 64
+     todos estudios         modelo   1      NaN     NaN     NaN          Aquilion
+     todos estudios         modelo   1      NaN     NaN     NaN         Emotion 6
+     todos estudios         modelo   1      NaN     NaN     NaN        Definition
+     todos estudios         modelo   1      NaN     NaN     NaN  LightSpeed Power
+     todos estudios         kernel  82      NaN     NaN     NaN          STANDARD
+     todos estudios         kernel  24      NaN     NaN     NaN              BONE
+     todos estudios         kernel  20      NaN     NaN     NaN              B30f
+     todos estudios         kernel  17      NaN     NaN     NaN              LUNG
+     todos estudios         kernel  10      NaN     NaN     NaN                 D
+     todos estudios         kernel   7      NaN     NaN     NaN              B45f
+     todos estudios         kernel   6      NaN     NaN     NaN                 B
+     todos estudios         kernel   4      NaN     NaN     NaN              B70f
+     todos estudios         kernel   4      NaN     NaN     NaN                 C
+     todos estudios         kernel   1      NaN     NaN     NaN              B50f
+     todos estudios         kernel   1      NaN     NaN     NaN              FC10
+     todos estudios         kernel   1      NaN     NaN     NaN              B20s
+     todos estudios         kernel   1      NaN     NaN     NaN              B31f
+     todos estudios familia_kernel 111      NaN     NaN     NaN             suave
+     todos estudios familia_kernel  55      NaN     NaN     NaN              duro
+     todos estudios familia_kernel  12      NaN     NaN     NaN        intermedio
+   benigno  nódulos            kvp 109    120.0  120.00   140.0                  
+   benigno  nódulos   corriente_ma 109    195.0   40.00   561.0                  
+   benigno  nódulos     espesor_mm 109      1.5    0.75     2.5                  
+   benigno  nódulos    ctdivol_mgy   0      NaN     NaN     NaN                  
+   benigno  nódulos     fabricante  71      NaN     NaN     NaN                GE
+   benigno  nódulos     fabricante  24      NaN     NaN     NaN           SIEMENS
+   benigno  nódulos     fabricante  13      NaN     NaN     NaN           PHILIPS
+   benigno  nódulos     fabricante   1      NaN     NaN     NaN           TOSHIBA
+   benigno  nódulos         modelo  25      NaN     NaN     NaN      LightSpeed16
+   benigno  nódulos         modelo  16      NaN     NaN     NaN      Sensation 16
+   benigno  nódulos         modelo  15      NaN     NaN     NaN  LightSpeed Ultra
+   benigno  nódulos         modelo  12      NaN     NaN     NaN   LightSpeed Plus
+   benigno  nódulos         modelo  11      NaN     NaN     NaN LightSpeed Pro 16
+   benigno  nódulos         modelo  10      NaN     NaN     NaN    Brilliance 16P
+   benigno  nódulos         modelo   6      NaN     NaN     NaN    LightSpeed VCT
+   benigno  nódulos         modelo   6      NaN     NaN     NaN      Sensation 64
+   benigno  nódulos         modelo   2      NaN     NaN     NaN     Brilliance 40
+   benigno  nódulos         modelo   2      NaN     NaN     NaN   LightSpeed QX/i
+   benigno  nódulos         modelo   1      NaN     NaN     NaN          Aquilion
+   benigno  nódulos         modelo   1      NaN     NaN     NaN         Emotion 6
+   benigno  nódulos         modelo   1      NaN     NaN     NaN        Definition
+   benigno  nódulos         modelo   1      NaN     NaN     NaN     Brilliance 64
+   benigno  nódulos         kernel  54      NaN     NaN     NaN          STANDARD
+   benigno  nódulos         kernel  15      NaN     NaN     NaN              B30f
+   benigno  nódulos         kernel  10      NaN     NaN     NaN              BONE
+   benigno  nódulos         kernel   7      NaN     NaN     NaN              LUNG
+   benigno  nódulos         kernel   5      NaN     NaN     NaN                 B
+   benigno  nódulos         kernel   5      NaN     NaN     NaN                 D
+   benigno  nódulos         kernel   4      NaN     NaN     NaN              B70f
+   benigno  nódulos         kernel   3      NaN     NaN     NaN              B45f
+   benigno  nódulos         kernel   3      NaN     NaN     NaN                 C
+   benigno  nódulos         kernel   1      NaN     NaN     NaN              FC10
+   benigno  nódulos         kernel   1      NaN     NaN     NaN              B20s
+   benigno  nódulos         kernel   1      NaN     NaN     NaN              B31f
+   benigno  nódulos familia_kernel  77      NaN     NaN     NaN             suave
+   benigno  nódulos familia_kernel  26      NaN     NaN     NaN              duro
+   benigno  nódulos familia_kernel   6      NaN     NaN     NaN        intermedio
+sospechoso  nódulos            kvp 108    120.0  120.00   140.0                  
+sospechoso  nódulos   corriente_ma 108    265.0   40.00   570.0                  
+sospechoso  nódulos     espesor_mm 108      2.0    0.60     2.5                  
+sospechoso  nódulos    ctdivol_mgy   0      NaN     NaN     NaN                  
+sospechoso  nódulos     fabricante  78      NaN     NaN     NaN                GE
+sospechoso  nódulos     fabricante  19      NaN     NaN     NaN           SIEMENS
+sospechoso  nódulos     fabricante  11      NaN     NaN     NaN           PHILIPS
+sospechoso  nódulos         modelo  30      NaN     NaN     NaN      LightSpeed16
+sospechoso  nódulos         modelo  18      NaN     NaN     NaN  LightSpeed Ultra
+sospechoso  nódulos         modelo  12      NaN     NaN     NaN   LightSpeed Plus
+sospechoso  nódulos         modelo  10      NaN     NaN     NaN    LightSpeed VCT
+sospechoso  nódulos         modelo  10      NaN     NaN     NaN      Sensation 16
+sospechoso  nódulos         modelo   8      NaN     NaN     NaN    Brilliance 16P
+sospechoso  nódulos         modelo   7      NaN     NaN     NaN      Sensation 64
+sospechoso  nódulos         modelo   4      NaN     NaN     NaN   LightSpeed QX/i
+sospechoso  nódulos         modelo   3      NaN     NaN     NaN LightSpeed Pro 16
+sospechoso  nódulos         modelo   2      NaN     NaN     NaN        Definition
+sospechoso  nódulos         modelo   2      NaN     NaN     NaN     Brilliance 40
+sospechoso  nódulos         modelo   1      NaN     NaN     NaN     Brilliance 64
+sospechoso  nódulos         modelo   1      NaN     NaN     NaN  LightSpeed Power
+sospechoso  nódulos         kernel  45      NaN     NaN     NaN          STANDARD
+sospechoso  nódulos         kernel  17      NaN     NaN     NaN              BONE
+sospechoso  nódulos         kernel  16      NaN     NaN     NaN              LUNG
+sospechoso  nódulos         kernel  10      NaN     NaN     NaN              B30f
+sospechoso  nódulos         kernel   8      NaN     NaN     NaN              B45f
+sospechoso  nódulos         kernel   7      NaN     NaN     NaN                 D
+sospechoso  nódulos         kernel   3      NaN     NaN     NaN                 B
+sospechoso  nódulos         kernel   1      NaN     NaN     NaN              B50f
+sospechoso  nódulos         kernel   1      NaN     NaN     NaN                 C
+sospechoso  nódulos familia_kernel  58      NaN     NaN     NaN             suave
+sospechoso  nódulos familia_kernel  40      NaN     NaN     NaN              duro
+sospechoso  nódulos familia_kernel  10      NaN     NaN     NaN        intermedio
+
+Por qué el índice de dosis es la corriente y no los mAs (por estudio):
+           exposicion_mas               tiempo_exposicion_ms              corriente_ma            
+                    count min  50%  max                count min 50%  max        count min 50% max
+fabricante                                                                                        
+GE                    123   1  880 7200                  123 400 570 1160          123  40 265 570
+PHILIPS                20 154  250  350                    0 NaN NaN  NaN           20 240 360 422
+SIEMENS                34  25 37.5  324                   26 500 500  600           34  50 105 561
+TOSHIBA                 1 130  130  130                    1 500 500  500            1 260 260 260
+
+[11 parámetros de adquisición: OK, 0.0 min]
+
+======================================================================
+13 puntaje robusto estricto (híbrido, σe² de LIDC, dosis de uso ×1/4)
+  python scripts/13_puntaje_robusto_estricto.py --anclaje hibrido --sigma-e2 lidc --dosis-uso 4
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: hibrido (resultados/07_baja_dosis_anclaje_hibrido_se6.csv) | dosis de uso: dosis ×1/4
+grupo_analisis   condicion   n  auc_estricto  ic95_inf  ic95_sup  auc_seleccion_en_08  diferencia
+         todos    original 112         0.938     0.893     0.974                0.938       0.000
+         todos  dosis ×1/2 112         0.936     0.888     0.971                0.936      -0.000
+         todos  dosis ×1/4 112         0.915     0.856     0.961                0.915      -0.000
+         todos dosis ×1/10 112         0.824     0.735     0.903                0.824       0.000
+         todos dosis ×1/20 112         0.760     0.655     0.854                0.760       0.000
+    sin calcio    original  71         0.918     0.844     0.975                0.910       0.008
+    sin calcio  dosis ×1/2  71         0.904     0.829     0.969                0.888       0.017
+    sin calcio  dosis ×1/4  71         0.889     0.808     0.956                0.881       0.007
+    sin calcio dosis ×1/10  71         0.843     0.749     0.930                0.864      -0.020
+    sin calcio dosis ×1/20  71         0.771     0.660     0.872                0.776      -0.005
+
+[13 puntaje robusto estricto (híbrido, σe² de LIDC, dosis de uso ×1/4): OK, 0.1 min]
+
+======================================================================
+13 puntaje robusto estricto (híbrido, σe² de LIDC, dosis de uso ×1/10)
+  python scripts/13_puntaje_robusto_estricto.py --anclaje hibrido --sigma-e2 lidc --dosis-uso 10
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: hibrido (resultados/07_baja_dosis_anclaje_hibrido_se6.csv) | dosis de uso: dosis ×1/10
+grupo_analisis   condicion   n  auc_estricto  ic95_inf  ic95_sup  auc_seleccion_en_08  diferencia
+         todos    original 112         0.809     0.720     0.888                0.764       0.045
+         todos  dosis ×1/2 112         0.806     0.715     0.886                0.762       0.043
+         todos  dosis ×1/4 112         0.801     0.710     0.882                0.755       0.046
+         todos dosis ×1/10 112         0.767     0.676     0.855                0.751       0.016
+         todos dosis ×1/20 112         0.735     0.639     0.828                0.723       0.012
+    sin calcio    original  71         0.901     0.817     0.973                0.901       0.000
+    sin calcio  dosis ×1/2  71         0.912     0.834     0.975                0.912       0.000
+    sin calcio  dosis ×1/4  71         0.917     0.843     0.975                0.916       0.001
+    sin calcio dosis ×1/10  71         0.920     0.843     0.978                0.910       0.010
+    sin calcio dosis ×1/20  71         0.919     0.822     0.980                0.908       0.011
+
+[13 puntaje robusto estricto (híbrido, σe² de LIDC, dosis de uso ×1/10): OK, 0.1 min]
+
+Listo (0.0 h). Todo quedó en /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/resultados/log_baja_dosis.txt
+
+######################################################################
+# ETAPA: final
+######################################################################
+
+======================================================================
+08 propuesta (híbrido, σe² de LIDC, dosis de uso ×1/4)
+  python scripts/08_propuesta.py --anclaje hibrido --sigma-e2 lidc --dosis-uso 4
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: hibrido (lee resultados/07_baja_dosis_anclaje_hibrido_se6.csv)
+Dosis de uso para decidir qué es robusto: dosis ×1/4
+
+################ TODOS: 112 nódulos {'benigno': 56, 'sospechoso': 56} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                       medida  ruido_tolerable_hu  CCC dosis ×1/4  ICC dosis ×1/4  CCC dosis ×1/10
+          nitidez_borde_hu_mm               99.96            1.00            1.00             0.98
+                    hu_desvio               99.96            1.00            1.00             0.99
+                  frac_calcio               99.96            1.00            1.00             0.97
+                     hu_media               99.96            1.00            1.00             0.99
+                 glcm_energia               57.85            0.96            0.96             0.90
+          anillo_ext_hu_media               57.85            0.99            0.99             0.93
+           glcm_cluster_shade               57.85            0.98            0.98             0.93
+          anillo_int_hu_media               57.85            0.98            0.99             0.95
+      glcm_cluster_prominence               57.85            0.97            0.97             0.90
+             glcm_correlacion               29.60            0.94            0.94             0.80
+                     area_mm2               29.60            1.00            1.00             0.23
+               glcm_contraste               29.60            0.97            0.97             0.73
+               diametro_eq_mm               29.60            1.00            1.00             0.65
+        anillo_ext_frac_denso               29.60            0.92            0.92             0.59
+anillo_ext_glcm_cluster_shade               29.60            0.95            0.95             0.80
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/4 (y AUC >= 0.7 al armar) ==
+    area_mm2, diametro_eq_mm, circularidad, solidez, excentricidad, circularidad_cruda, solidez_cruda, nitidez_borde_hu_mm, hu_media, hu_desvio, hu_asimetria, hu_curtosis, frac_calcio, glcm_energia, glcm_entropia, glcm_contraste, glcm_homogeneidad, glcm_correlacion, glcm_cluster_shade, glcm_cluster_prominence
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.846                     0.938                         0.938
+dosis ×1/2           0.842                     0.936                         0.936
+dosis ×1/4           0.841                     0.915                         0.915
+dosis ×1/10          0.822                     0.824                         0.824
+dosis ×1/20          0.822                     0.760                         0.760
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.846 [0.77-0.92]        0.938 [0.89-0.97]            0.938 [0.89-0.97]
+dosis ×1/2   0.842 [0.76-0.92]        0.936 [0.89-0.97]            0.936 [0.89-0.97]
+dosis ×1/4   0.841 [0.76-0.91]        0.915 [0.86-0.96]            0.915 [0.86-0.96]
+dosis ×1/10  0.822 [0.73-0.90]        0.824 [0.74-0.90]            0.824 [0.74-0.90]
+dosis ×1/20  0.822 [0.73-0.90]        0.760 [0.66-0.85]            0.760 [0.66-0.85]
+
+################ SIN CALCIO: 71 nódulos {'sospechoso': 49, 'benigno': 22} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                            medida  ruido_tolerable_hu  CCC dosis ×1/4  ICC dosis ×1/4  CCC dosis ×1/10
+                          area_mm2               96.54            1.00            1.00             1.00
+                    diametro_eq_mm               96.54            1.00            1.00             1.00
+           frac_contacto_no_pulmon               96.54            1.00            1.00             0.98
+                           solidez               56.80            0.96            0.96             0.90
+               nitidez_borde_hu_mm               56.80            0.99            0.99             0.93
+               anillo_ext_hu_media               56.80            0.99            0.99             0.95
+                          hu_media               56.80            0.99            0.99             0.95
+               anillo_int_hu_media               56.80            0.98            0.98             0.95
+                circularidad_cruda               56.80            0.96            0.96             0.91
+anillo_ext_glcm_cluster_prominence               28.57            0.95            0.95             0.64
+                     solidez_cruda               28.57            0.95            0.95             0.88
+                         hu_desvio               28.57            0.93            0.93             0.63
+                      hu_asimetria               28.57            0.94            0.94             0.73
+                       hu_curtosis               28.57            0.94            0.95             0.76
+                      circularidad               28.57            0.96            0.96             0.88
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/4 (y AUC >= 0.7 al armar) ==
+    area_mm2, diametro_eq_mm, circularidad, solidez, excentricidad, circularidad_cruda, solidez_cruda, nitidez_borde_hu_mm, hu_media, hu_desvio, hu_asimetria, hu_curtosis, glcm_correlacion, glcm_cluster_shade, glcm_cluster_prominence
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.936                     0.919                         0.910
+dosis ×1/2           0.930                     0.904                         0.888
+dosis ×1/4           0.932                     0.891                         0.881
+dosis ×1/10          0.931                     0.847                         0.864
+dosis ×1/20          0.928                     0.774                         0.776
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.936 [0.87-0.99]        0.919 [0.85-0.98]            0.910 [0.83-0.97]
+dosis ×1/2   0.930 [0.86-0.99]        0.904 [0.83-0.97]            0.888 [0.81-0.96]
+dosis ×1/4   0.932 [0.86-0.99]        0.891 [0.81-0.96]            0.881 [0.78-0.96]
+dosis ×1/10  0.931 [0.86-0.99]        0.847 [0.75-0.93]            0.864 [0.77-0.94]
+dosis ×1/20  0.928 [0.86-0.98]        0.774 [0.66-0.87]            0.776 [0.66-0.88]
+
+== 3. Calcio robusto al ruido ==
+condicion                                              original dosis ×1/2 dosis ×1/4 dosis ×1/10 dosis ×1/20
+sin calcio: calcio falso medio (umbral simple)         0.000122   0.000119   0.002998    0.016091    0.050705
+sin calcio: calcio falso medio (robusto)                    0.0        0.0        0.0    0.002627     0.01536
+sin calcio: % que parece calcificado (umbral simple)        0.0        0.0   5.633803    19.71831   45.070423
+sin calcio: % que parece calcificado (robusto)              0.0        0.0        0.0    7.042254   21.126761
+calcificados: % detectado (umbral simple)                 100.0      100.0      100.0   97.560976       100.0
+calcificados: % detectado (robusto)                   90.243902  90.243902  92.682927   95.121951   95.121951
+n sin / con calcio                                      71 / 41    71 / 41    71 / 41     71 / 41     71 / 41
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_hibrido_se6.png
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_hibrido_se6_sincalcio.png
+
+[08 propuesta (híbrido, σe² de LIDC, dosis de uso ×1/4): OK, 0.2 min]
+
+======================================================================
+08 propuesta (híbrido, σe² de LIDC, dosis de uso ×1/10)
+  python scripts/08_propuesta.py --anclaje hibrido --sigma-e2 lidc --dosis-uso 10
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: hibrido (lee resultados/07_baja_dosis_anclaje_hibrido_se6.csv)
+Dosis de uso para decidir qué es robusto: dosis ×1/10
+
+################ TODOS: 112 nódulos {'benigno': 56, 'sospechoso': 56} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                       medida  ruido_tolerable_hu  CCC dosis ×1/10  ICC dosis ×1/10
+          nitidez_borde_hu_mm               99.96             0.98             0.98
+                    hu_desvio               99.96             0.99             0.99
+                  frac_calcio               99.96             0.97             0.97
+                     hu_media               99.96             0.99             0.99
+                 glcm_energia               57.85             0.90             0.90
+          anillo_ext_hu_media               57.85             0.93             0.93
+           glcm_cluster_shade               57.85             0.93             0.93
+          anillo_int_hu_media               57.85             0.95             0.95
+      glcm_cluster_prominence               57.85             0.90             0.90
+             glcm_correlacion               29.60             0.80             0.80
+                     area_mm2               29.60             0.23             0.24
+               glcm_contraste               29.60             0.73             0.74
+               diametro_eq_mm               29.60             0.65             0.66
+        anillo_ext_frac_denso               29.60             0.59             0.60
+anillo_ext_glcm_cluster_shade               29.60             0.80             0.80
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/10 (y AUC >= 0.7 al armar) ==
+    nitidez_borde_hu_mm, hu_media, hu_desvio, frac_calcio, glcm_energia, glcm_cluster_shade, glcm_cluster_prominence
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.846                     0.938                         0.764
+dosis ×1/2           0.842                     0.936                         0.762
+dosis ×1/4           0.841                     0.915                         0.755
+dosis ×1/10          0.822                     0.824                         0.751
+dosis ×1/20          0.822                     0.760                         0.723
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.846 [0.77-0.92]        0.938 [0.89-0.97]            0.764 [0.67-0.85]
+dosis ×1/2   0.842 [0.76-0.92]        0.936 [0.89-0.97]            0.762 [0.67-0.85]
+dosis ×1/4   0.841 [0.76-0.91]        0.915 [0.86-0.96]            0.755 [0.66-0.84]
+dosis ×1/10  0.822 [0.73-0.90]        0.824 [0.74-0.90]            0.751 [0.65-0.84]
+dosis ×1/20  0.822 [0.73-0.90]        0.760 [0.66-0.85]            0.723 [0.62-0.82]
+
+################ SIN CALCIO: 71 nódulos {'sospechoso': 49, 'benigno': 22} ################
+
+== 1. Cuánto ruido aguanta cada medida (CCC >= 0.9); las 15 más robustas ==
+                            medida  ruido_tolerable_hu  CCC dosis ×1/10  ICC dosis ×1/10
+                          area_mm2               96.54             1.00             1.00
+                    diametro_eq_mm               96.54             1.00             1.00
+           frac_contacto_no_pulmon               96.54             0.98             0.98
+                           solidez               56.80             0.90             0.91
+               nitidez_borde_hu_mm               56.80             0.93             0.94
+               anillo_ext_hu_media               56.80             0.95             0.95
+                          hu_media               56.80             0.95             0.95
+               anillo_int_hu_media               56.80             0.95             0.95
+                circularidad_cruda               56.80             0.91             0.91
+anillo_ext_glcm_cluster_prominence               28.57             0.64             0.65
+                     solidez_cruda               28.57             0.88             0.88
+                         hu_desvio               28.57             0.63             0.63
+                      hu_asimetria               28.57             0.73             0.73
+                       hu_curtosis               28.57             0.76             0.76
+                      circularidad               28.57             0.88             0.88
+
+== 2. Puntaje robusto: candidatas = interior con CCC >= 0.9 a dosis ×1/10 (y AUC >= 0.7 al armar) ==
+    area_mm2, diametro_eq_mm, solidez, circularidad_cruda, frac_fina, nitidez_borde_hu_mm, hu_media
+   AUC transferido (armado con la original, aplicado a cada dosis):
+puntaje      diámetro solo  interior (como en el 06)  interior robusto (propuesta)
+condicion                                                                         
+original             0.936                     0.919                         0.901
+dosis ×1/2           0.930                     0.904                         0.912
+dosis ×1/4           0.932                     0.891                         0.916
+dosis ×1/10          0.931                     0.847                         0.910
+dosis ×1/20          0.928                     0.774                         0.908
+   mismo AUC con su IC 95 % (bootstrap por paciente):
+puntaje          diámetro solo interior (como en el 06) interior robusto (propuesta)
+condicion                                                                           
+original     0.936 [0.87-0.99]        0.919 [0.85-0.98]            0.901 [0.82-0.97]
+dosis ×1/2   0.930 [0.86-0.99]        0.904 [0.83-0.97]            0.912 [0.84-0.97]
+dosis ×1/4   0.932 [0.86-0.99]        0.891 [0.81-0.96]            0.916 [0.84-0.97]
+dosis ×1/10  0.931 [0.86-0.99]        0.847 [0.75-0.93]            0.910 [0.83-0.97]
+dosis ×1/20  0.928 [0.86-0.98]        0.774 [0.66-0.87]            0.908 [0.81-0.97]
+
+== 3. Calcio robusto al ruido ==
+condicion                                              original dosis ×1/2 dosis ×1/4 dosis ×1/10 dosis ×1/20
+sin calcio: calcio falso medio (umbral simple)         0.000122   0.000119   0.002998    0.016091    0.050705
+sin calcio: calcio falso medio (robusto)                    0.0        0.0        0.0    0.002627     0.01536
+sin calcio: % que parece calcificado (umbral simple)        0.0        0.0   5.633803    19.71831   45.070423
+sin calcio: % que parece calcificado (robusto)              0.0        0.0        0.0    7.042254   21.126761
+calcificados: % detectado (umbral simple)                 100.0      100.0      100.0   97.560976       100.0
+calcificados: % detectado (robusto)                   90.243902  90.243902  92.682927   95.121951   95.121951
+n sin / con calcio                                      71 / 41    71 / 41    71 / 41     71 / 41     71 / 41
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_hibrido_se6_uso10.png
+-> /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/figuras/08_propuesta_anclaje_hibrido_se6_uso10_sincalcio.png
+
+[08 propuesta (híbrido, σe² de LIDC, dosis de uso ×1/10): OK, 0.2 min]
+
+======================================================================
+11 parámetros de adquisición
+  python scripts/11_parametros_dicom.py
+======================================================================
+Nódulos: 217 | estudios: 178
+     grupo   unidad      parametro   n  mediana  minimo  maximo             valor
+     todos estudios            kvp 178    120.0  120.00   140.0                  
+     todos estudios   corriente_ma 178    240.0   40.00   570.0                  
+     todos estudios     espesor_mm 178      1.5    0.60     2.5                  
+     todos estudios    ctdivol_mgy   0      NaN     NaN     NaN                  
+     todos estudios     fabricante 123      NaN     NaN     NaN                GE
+     todos estudios     fabricante  34      NaN     NaN     NaN           SIEMENS
+     todos estudios     fabricante  20      NaN     NaN     NaN           PHILIPS
+     todos estudios     fabricante   1      NaN     NaN     NaN           TOSHIBA
+     todos estudios         modelo  42      NaN     NaN     NaN      LightSpeed16
+     todos estudios         modelo  28      NaN     NaN     NaN  LightSpeed Ultra
+     todos estudios         modelo  20      NaN     NaN     NaN      Sensation 16
+     todos estudios         modelo  18      NaN     NaN     NaN   LightSpeed Plus
+     todos estudios         modelo  14      NaN     NaN     NaN    LightSpeed VCT
+     todos estudios         modelo  14      NaN     NaN     NaN LightSpeed Pro 16
+     todos estudios         modelo  14      NaN     NaN     NaN    Brilliance 16P
+     todos estudios         modelo  12      NaN     NaN     NaN      Sensation 64
+     todos estudios         modelo   6      NaN     NaN     NaN   LightSpeed QX/i
+     todos estudios         modelo   4      NaN     NaN     NaN     Brilliance 40
+     todos estudios         modelo   2      NaN     NaN     NaN     Brilliance 64
+     todos estudios         modelo   1      NaN     NaN     NaN          Aquilion
+     todos estudios         modelo   1      NaN     NaN     NaN         Emotion 6
+     todos estudios         modelo   1      NaN     NaN     NaN        Definition
+     todos estudios         modelo   1      NaN     NaN     NaN  LightSpeed Power
+     todos estudios         kernel  82      NaN     NaN     NaN          STANDARD
+     todos estudios         kernel  24      NaN     NaN     NaN              BONE
+     todos estudios         kernel  20      NaN     NaN     NaN              B30f
+     todos estudios         kernel  17      NaN     NaN     NaN              LUNG
+     todos estudios         kernel  10      NaN     NaN     NaN                 D
+     todos estudios         kernel   7      NaN     NaN     NaN              B45f
+     todos estudios         kernel   6      NaN     NaN     NaN                 B
+     todos estudios         kernel   4      NaN     NaN     NaN              B70f
+     todos estudios         kernel   4      NaN     NaN     NaN                 C
+     todos estudios         kernel   1      NaN     NaN     NaN              B50f
+     todos estudios         kernel   1      NaN     NaN     NaN              FC10
+     todos estudios         kernel   1      NaN     NaN     NaN              B20s
+     todos estudios         kernel   1      NaN     NaN     NaN              B31f
+     todos estudios familia_kernel 111      NaN     NaN     NaN             suave
+     todos estudios familia_kernel  55      NaN     NaN     NaN              duro
+     todos estudios familia_kernel  12      NaN     NaN     NaN        intermedio
+   benigno  nódulos            kvp 109    120.0  120.00   140.0                  
+   benigno  nódulos   corriente_ma 109    195.0   40.00   561.0                  
+   benigno  nódulos     espesor_mm 109      1.5    0.75     2.5                  
+   benigno  nódulos    ctdivol_mgy   0      NaN     NaN     NaN                  
+   benigno  nódulos     fabricante  71      NaN     NaN     NaN                GE
+   benigno  nódulos     fabricante  24      NaN     NaN     NaN           SIEMENS
+   benigno  nódulos     fabricante  13      NaN     NaN     NaN           PHILIPS
+   benigno  nódulos     fabricante   1      NaN     NaN     NaN           TOSHIBA
+   benigno  nódulos         modelo  25      NaN     NaN     NaN      LightSpeed16
+   benigno  nódulos         modelo  16      NaN     NaN     NaN      Sensation 16
+   benigno  nódulos         modelo  15      NaN     NaN     NaN  LightSpeed Ultra
+   benigno  nódulos         modelo  12      NaN     NaN     NaN   LightSpeed Plus
+   benigno  nódulos         modelo  11      NaN     NaN     NaN LightSpeed Pro 16
+   benigno  nódulos         modelo  10      NaN     NaN     NaN    Brilliance 16P
+   benigno  nódulos         modelo   6      NaN     NaN     NaN    LightSpeed VCT
+   benigno  nódulos         modelo   6      NaN     NaN     NaN      Sensation 64
+   benigno  nódulos         modelo   2      NaN     NaN     NaN     Brilliance 40
+   benigno  nódulos         modelo   2      NaN     NaN     NaN   LightSpeed QX/i
+   benigno  nódulos         modelo   1      NaN     NaN     NaN          Aquilion
+   benigno  nódulos         modelo   1      NaN     NaN     NaN         Emotion 6
+   benigno  nódulos         modelo   1      NaN     NaN     NaN        Definition
+   benigno  nódulos         modelo   1      NaN     NaN     NaN     Brilliance 64
+   benigno  nódulos         kernel  54      NaN     NaN     NaN          STANDARD
+   benigno  nódulos         kernel  15      NaN     NaN     NaN              B30f
+   benigno  nódulos         kernel  10      NaN     NaN     NaN              BONE
+   benigno  nódulos         kernel   7      NaN     NaN     NaN              LUNG
+   benigno  nódulos         kernel   5      NaN     NaN     NaN                 B
+   benigno  nódulos         kernel   5      NaN     NaN     NaN                 D
+   benigno  nódulos         kernel   4      NaN     NaN     NaN              B70f
+   benigno  nódulos         kernel   3      NaN     NaN     NaN              B45f
+   benigno  nódulos         kernel   3      NaN     NaN     NaN                 C
+   benigno  nódulos         kernel   1      NaN     NaN     NaN              FC10
+   benigno  nódulos         kernel   1      NaN     NaN     NaN              B20s
+   benigno  nódulos         kernel   1      NaN     NaN     NaN              B31f
+   benigno  nódulos familia_kernel  77      NaN     NaN     NaN             suave
+   benigno  nódulos familia_kernel  26      NaN     NaN     NaN              duro
+   benigno  nódulos familia_kernel   6      NaN     NaN     NaN        intermedio
+sospechoso  nódulos            kvp 108    120.0  120.00   140.0                  
+sospechoso  nódulos   corriente_ma 108    265.0   40.00   570.0                  
+sospechoso  nódulos     espesor_mm 108      2.0    0.60     2.5                  
+sospechoso  nódulos    ctdivol_mgy   0      NaN     NaN     NaN                  
+sospechoso  nódulos     fabricante  78      NaN     NaN     NaN                GE
+sospechoso  nódulos     fabricante  19      NaN     NaN     NaN           SIEMENS
+sospechoso  nódulos     fabricante  11      NaN     NaN     NaN           PHILIPS
+sospechoso  nódulos         modelo  30      NaN     NaN     NaN      LightSpeed16
+sospechoso  nódulos         modelo  18      NaN     NaN     NaN  LightSpeed Ultra
+sospechoso  nódulos         modelo  12      NaN     NaN     NaN   LightSpeed Plus
+sospechoso  nódulos         modelo  10      NaN     NaN     NaN    LightSpeed VCT
+sospechoso  nódulos         modelo  10      NaN     NaN     NaN      Sensation 16
+sospechoso  nódulos         modelo   8      NaN     NaN     NaN    Brilliance 16P
+sospechoso  nódulos         modelo   7      NaN     NaN     NaN      Sensation 64
+sospechoso  nódulos         modelo   4      NaN     NaN     NaN   LightSpeed QX/i
+sospechoso  nódulos         modelo   3      NaN     NaN     NaN LightSpeed Pro 16
+sospechoso  nódulos         modelo   2      NaN     NaN     NaN        Definition
+sospechoso  nódulos         modelo   2      NaN     NaN     NaN     Brilliance 40
+sospechoso  nódulos         modelo   1      NaN     NaN     NaN     Brilliance 64
+sospechoso  nódulos         modelo   1      NaN     NaN     NaN  LightSpeed Power
+sospechoso  nódulos         kernel  45      NaN     NaN     NaN          STANDARD
+sospechoso  nódulos         kernel  17      NaN     NaN     NaN              BONE
+sospechoso  nódulos         kernel  16      NaN     NaN     NaN              LUNG
+sospechoso  nódulos         kernel  10      NaN     NaN     NaN              B30f
+sospechoso  nódulos         kernel   8      NaN     NaN     NaN              B45f
+sospechoso  nódulos         kernel   7      NaN     NaN     NaN                 D
+sospechoso  nódulos         kernel   3      NaN     NaN     NaN                 B
+sospechoso  nódulos         kernel   1      NaN     NaN     NaN              B50f
+sospechoso  nódulos         kernel   1      NaN     NaN     NaN                 C
+sospechoso  nódulos familia_kernel  58      NaN     NaN     NaN             suave
+sospechoso  nódulos familia_kernel  40      NaN     NaN     NaN              duro
+sospechoso  nódulos familia_kernel  10      NaN     NaN     NaN        intermedio
+
+Por qué el índice de dosis es la corriente y no los mAs (por estudio):
+           exposicion_mas               tiempo_exposicion_ms              corriente_ma            
+                    count min  50%  max                count min 50%  max        count min 50% max
+fabricante                                                                                        
+GE                    123   1  880 7200                  123 400 570 1160          123  40 265 570
+PHILIPS                20 154  250  350                    0 NaN NaN  NaN           20 240 360 422
+SIEMENS                34  25 37.5  324                   26 500 500  600           34  50 105 561
+TOSHIBA                 1 130  130  130                    1 500 500  500            1 260 260 260
+
+[11 parámetros de adquisición: OK, 0.0 min]
+
+======================================================================
+13 puntaje robusto estricto (híbrido, σe² de LIDC, dosis de uso ×1/4)
+  python scripts/13_puntaje_robusto_estricto.py --anclaje hibrido --sigma-e2 lidc --dosis-uso 4
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: hibrido (resultados/07_baja_dosis_anclaje_hibrido_se6.csv) | dosis de uso: dosis ×1/4
+grupo_analisis   condicion   n  auc_estricto  ic95_inf  ic95_sup  auc_seleccion_en_08  diferencia
+         todos    original 112         0.938     0.893     0.974                0.938       0.000
+         todos  dosis ×1/2 112         0.936     0.888     0.971                0.936      -0.000
+         todos  dosis ×1/4 112         0.915     0.856     0.961                0.915      -0.000
+         todos dosis ×1/10 112         0.824     0.735     0.903                0.824       0.000
+         todos dosis ×1/20 112         0.760     0.655     0.854                0.760       0.000
+    sin calcio    original  71         0.918     0.844     0.975                0.910       0.008
+    sin calcio  dosis ×1/2  71         0.904     0.829     0.969                0.888       0.017
+    sin calcio  dosis ×1/4  71         0.889     0.808     0.956                0.881       0.007
+    sin calcio dosis ×1/10  71         0.843     0.749     0.930                0.864      -0.020
+    sin calcio dosis ×1/20  71         0.771     0.660     0.872                0.776      -0.005
+
+[13 puntaje robusto estricto (híbrido, σe² de LIDC, dosis de uso ×1/4): OK, 0.1 min]
+
+======================================================================
+13 puntaje robusto estricto (híbrido, σe² de LIDC, dosis de uso ×1/10)
+  python scripts/13_puntaje_robusto_estricto.py --anclaje hibrido --sigma-e2 lidc --dosis-uso 10
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Anclaje: hibrido (resultados/07_baja_dosis_anclaje_hibrido_se6.csv) | dosis de uso: dosis ×1/10
+grupo_analisis   condicion   n  auc_estricto  ic95_inf  ic95_sup  auc_seleccion_en_08  diferencia
+         todos    original 112         0.809     0.720     0.888                0.764       0.045
+         todos  dosis ×1/2 112         0.806     0.715     0.886                0.762       0.043
+         todos  dosis ×1/4 112         0.801     0.710     0.882                0.755       0.046
+         todos dosis ×1/10 112         0.767     0.676     0.855                0.751       0.016
+         todos dosis ×1/20 112         0.735     0.639     0.828                0.723       0.012
+    sin calcio    original  71         0.901     0.817     0.973                0.901       0.000
+    sin calcio  dosis ×1/2  71         0.912     0.834     0.975                0.912       0.000
+    sin calcio  dosis ×1/4  71         0.917     0.843     0.975                0.916       0.001
+    sin calcio dosis ×1/10  71         0.920     0.843     0.978                0.910       0.010
+    sin calcio dosis ×1/20  71         0.919     0.822     0.980                0.908       0.011
+
+[13 puntaje robusto estricto (híbrido, σe² de LIDC, dosis de uso ×1/10): OK, 0.1 min]
+
+Listo (0.0 h). Todo quedó en /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/resultados/log_baja_dosis.txt
+
+######################################################################
+# ETAPA: control
+######################################################################
+
+======================================================================
+Control: AUC con el criterio de aceptabilidad original (112) y el justo (92)
+  python comparaciones/sensibilidad_aceptables.py --anclaje hibrido --sigma-e2 lidc
+======================================================================
+/Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/tpi/compat.py:28: UserWarning: pkg_resources is deprecated as an API. See https://setuptools.pypa.io/en/latest/pkg_resources.html. The pkg_resources package is slated for removal as early as 2025-11-30. Refrain from using this package or pin to Setuptools<81.
+  import pkg_resources  # noqa: F401
+Simulación: 07_baja_dosis_anclaje_hibrido_se6.csv | dosis de uso del puntaje robusto: dosis ×1/4
+
+Criterio original (vs consenso): 112 nódulos {'benigno': 56, 'sospechoso': 56}
+
+Criterio justo (vs cada radiólogo): 92 nódulos {'sospechoso': 48, 'benigno': 44}
+
+== diámetro solo: AUC [IC 95 %] con cada criterio de aceptabilidad ==
+criterio    justo (vs cada radiólogo) original (vs consenso)
+condicion                                                   
+original            0.885 [0.81-0.94]      0.846 [0.77-0.92]
+dosis ×1/2          0.881 [0.81-0.94]      0.842 [0.76-0.92]
+dosis ×1/4          0.882 [0.81-0.94]      0.841 [0.76-0.91]
+dosis ×1/10         0.851 [0.76-0.92]      0.822 [0.73-0.90]
+dosis ×1/20         0.852 [0.76-0.92]      0.822 [0.73-0.90]
+
+== interior (como en el 06): AUC [IC 95 %] con cada criterio de aceptabilidad ==
+criterio    justo (vs cada radiólogo) original (vs consenso)
+condicion                                                   
+original            0.922 [0.87-0.97]      0.938 [0.89-0.97]
+dosis ×1/2          0.925 [0.87-0.97]      0.936 [0.89-0.97]
+dosis ×1/4          0.905 [0.84-0.96]      0.915 [0.86-0.96]
+dosis ×1/10         0.818 [0.72-0.91]      0.824 [0.74-0.90]
+dosis ×1/20         0.788 [0.68-0.88]      0.760 [0.66-0.85]
+
+== interior robusto (propuesta): AUC [IC 95 %] con cada criterio de aceptabilidad ==
+criterio    justo (vs cada radiólogo) original (vs consenso)
+condicion                                                   
+original            0.922 [0.87-0.97]      0.938 [0.89-0.97]
+dosis ×1/2          0.925 [0.87-0.97]      0.936 [0.89-0.97]
+dosis ×1/4          0.905 [0.84-0.96]      0.915 [0.86-0.96]
+dosis ×1/10         0.818 [0.72-0.91]      0.824 [0.74-0.90]
+dosis ×1/20         0.788 [0.68-0.88]      0.760 [0.66-0.85]
+
+Mayor diferencia de AUC entre criterios: 0.041 (diámetro solo / dosis ×1/4); compararla con el ancho de los IC de arriba
+
+[Control: AUC con el criterio de aceptabilidad original (112) y el justo (92): OK, 0.2 min]
+
+Listo (0.0 h). Todo quedó en /Users/pilar/Documents/GitHub/PSIB_TP_IMAGENES/resultados/log_baja_dosis.txt

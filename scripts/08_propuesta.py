@@ -226,6 +226,16 @@ def analizar(df, sufijo, titulo):
     return rt, pr
 
 
+def sufijo_sigma_e2(valor, anclaje):
+    """El mismo sufijo que le pone el 07 (scripts/07_baja_dosis.py, sufijo_anclaje)."""
+    if valor is None or anclaje == "ruido":
+        return ""
+    if valor in ("lidc", "lidc_sup"):
+        t = pd.read_csv(C.DIR_RESULTADOS / "07a_electronico.csv").iloc[0]
+        valor = round(float(t.sigma_e2 if valor == "lidc" else t.ic95_sup), 1)
+    return f"_se{float(valor):g}"
+
+
 def main():
     import argparse
     ap = argparse.ArgumentParser()
@@ -234,12 +244,16 @@ def main():
     ap.add_argument("--dosis-uso", type=int, default=4,
                     help="denominador de la dosis con la que se decide qué medida es robusta "
                          "(4 = ×1/4, la de referencia; 10 = ×1/10, para ver cuánto depende de esta elección)")
+    ap.add_argument("--sigma-e2", default=None,
+                    help="para los anclajes con ruido electrónico: el σe² con el que se corrió el 07 "
+                         "(un número, 'lidc' o 'lidc_sup'); elige el archivo 07_baja_dosis..._se<valor>.csv")
     args = ap.parse_args()
     global DOSIS_USO
     DOSIS_USO = f"dosis ×1/{args.dosis_uso}"
     if DOSIS_USO not in DOSIS:
         raise SystemExit(f"{DOSIS_USO} no está entre las condiciones simuladas: {DOSIS}")
     a = {"mas": "", "ruido": "_anclaje_ruido", "hibrido": "_anclaje_hibrido"}[args.anclaje]
+    a += sufijo_sigma_e2(args.sigma_e2, args.anclaje)
     sufijo_uso = "" if args.dosis_uso == 4 else f"_uso{args.dosis_uso}"
     print(f"Anclaje: {args.anclaje} (lee resultados/07_baja_dosis{a}.csv)")
     df = poblacion(pd.read_csv(C.DIR_RESULTADOS / f"07_baja_dosis{a}.csv"))

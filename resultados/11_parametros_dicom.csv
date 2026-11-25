@@ -1,0 +1,179 @@
+paciente,scan_id,nodulo,indice_corte,z_mm,fabricante,modelo,kvp,corriente_ma,tiempo_exposicion_ms,exposicion_mas,kernel,espesor_mm,diametro_reconstruccion_mm,diametro_adquisicion_mm,ctdivol_mgy,pitch,colimacion_fila_mm,colimacion_total_mm,filtro_bowtie,descripcion_estudio,mas_efectivo,familia_kernel,ventana_fbp,grupo,conjunto
+LIDC-IDRI-0004,15,0,76,-230.0,GE,LightSpeed16,120.0,440.0,690.0,14.0,STANDARD,1.25,421.0,500.0,,,,,BODY FILTER,,14.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0011,22,5,59,-180.25,GE,LightSpeed16,120.0,265.0,1107.0,28.0,STANDARD,2.5,380.0,500.0,,,,,BODY FILTER,,28.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0018,29,3,109,-48.810001,GE,LightSpeed Plus,120.0,400.0,570.0,4484.0,STANDARD,2.5,340.0,500.0,,,,,BODY FILTER,,4484.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0021,32,2,126,-60.5,GE,LightSpeed Plus,120.0,350.0,570.0,4565.0,STANDARD,2.5,380.0,500.0,,,,,BODY FILTER,,4565.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0023,34,0,118,-80.75,GE,LightSpeed16,120.0,265.0,1107.0,28.0,STANDARD,2.5,380.0,500.0,,,,,BODY FILTER,,28.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0024,35,2,84,-135.75,GE,LightSpeed16,120.0,265.0,1160.0,28.0,STANDARD,2.5,400.0,500.0,,,,,BODY FILTER,,28.0,suave,hann,benigno,evaluacion
+LIDC-IDRI-0031,42,2,89,-156.5,GE,LightSpeed16,120.0,265.0,1160.0,28.0,STANDARD,2.5,440.0,500.0,,,,,BODY FILTER,,28.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0037,48,1,107,-93.5,GE,LightSpeed16,120.0,265.0,1107.0,28.0,STANDARD,2.5,320.0,500.0,,,,,BODY FILTER,,28.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0039,50,0,120,-180.0,GE,LightSpeed VCT,120.0,295.0,500.0,4.0,STANDARD,1.25,418.0,500.0,,,,,BODY FILTER,,4.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0043,54,0,56,-155.25,GE,LightSpeed VCT,120.0,397.0,400.0,20.0,STANDARD,2.5,380.0,500.0,,,,,BODY FILTER,,20.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0044,55,1,64,-222.5,GE,LightSpeed Plus,120.0,400.0,570.0,5151.0,STANDARD,2.5,360.0,500.0,,,,,BODY FILTER,,5151.0,suave,hann,benigno,evaluacion
+LIDC-IDRI-0045,56,2,46,-244.5,GE,LightSpeed Plus,120.0,365.0,570.0,4274.0,STANDARD,2.5,340.0,500.0,,,,,BODY FILTER,,4274.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0046,57,4,40,-245.0,GE,LightSpeed16,120.0,300.0,1160.0,32.0,STANDARD,2.5,380.0,500.0,,,,,BODY FILTER,,32.0,suave,hann,benigno,evaluacion
+LIDC-IDRI-0049,60,14,72,-171.25,GE,LightSpeed Plus,120.0,350.0,570.0,4098.0,STANDARD,2.5,330.0,500.0,,,,,BODY FILTER,,4098.0,suave,hann,benigno,evaluacion
+LIDC-IDRI-0051,62,1,79,-135.75,GE,LightSpeed Plus,120.0,350.0,570.0,4098.0,STANDARD,2.5,480.0,500.0,,,,,BODY FILTER,,4098.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0052,63,0,84,-249.5,GE,LightSpeed VCT,120.0,360.0,400.0,4.0,STANDARD,1.25,380.0,500.0,,,,,BODY FILTER,,4.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0055,66,4,121,-68.75,GE,LightSpeed16,120.0,265.0,1160.0,28.0,STANDARD,2.5,360.0,500.0,,,,,BODY FILTER,,28.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0057,68,0,160,-100.0,GE,LightSpeed16,120.0,222.0,690.0,7.0,STANDARD,1.25,374.0,500.0,,,,,BODY FILTER,,7.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0059,70,0,101,-100.830002,GE,LightSpeed QX/i,120.0,400.0,912.0,7200.0,STANDARD,2.5,360.0,500.0,,,,,BODY FILTER,,7200.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0060,71,0,40,-237.0,GE,LightSpeed16,120.0,265.0,1107.0,28.0,STANDARD,2.5,360.0,500.0,,,,,BODY FILTER,,28.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0061,72,0,39,-240.5,GE,LightSpeed16,120.0,265.0,1107.0,28.0,STANDARD,2.5,420.0,500.0,,,,,BODY FILTER,,28.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0064,75,1,112,-79.0,GE,LightSpeed16,120.0,265.0,1160.0,28.0,STANDARD,2.5,400.0,500.0,,,,,BODY FILTER,,28.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0066,77,2,663,-109.5,SIEMENS,Sensation 64,120.0,240.0,500.0,80.0,B50f,0.6,326.0,500.0,,,,,0.0,,80.0,intermedio,shepp-logan,sospechoso,entrenamiento
+LIDC-IDRI-0067,78,0,114,-227.5,GE,LightSpeed VCT,120.0,360.0,400.0,4.0,LUNG,1.25,400.0,500.0,,,,,BODY FILTER,,4.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0068,79,5,216,-64.0,GE,LightSpeed VCT,120.0,298.0,500.0,4.0,STANDARD,1.25,350.0,500.0,,0.984375,0.625,40.0,BODY FILTER,CT CHEST W/ CONT,4.063492063492063,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0077,87,0,73,-176.5,GE,LightSpeed16,120.0,320.0,1160.0,34.0,LUNG,2.5,340.0,500.0,,,,,BODY FILTER,,34.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0081,89,0,68,-173.5,GE,LightSpeed VCT,120.0,496.0,400.0,25.0,STANDARD,2.5,440.0,500.0,,,,,BODY FILTER,,25.0,suave,hann,sospechoso,evaluacion
+LIDC-IDRI-0084,92,1,56,1433.5,TOSHIBA,Aquilion,135.0,260.0,500.0,130.0,FC10,2.0,360.937,400.0,,,,,,,130.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0087,95,0,107,-95.5,GE,LightSpeed Plus,120.0,320.0,912.0,5799.0,LUNG,2.5,360.0,500.0,,,,,BODY FILTER,,5799.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0088,96,1,154,-100.0,GE,LightSpeed16,120.0,301.0,707.0,9.0,STANDARD,1.25,312.0,500.0,,1.3749999046325685,1.25,20.0,BODY FILTER,CT CH/AB/PEL W/O,6.545454999435078,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0089,97,0,49,-257.75,GE,LightSpeed Plus,120.0,400.0,570.0,5151.0,STANDARD,2.5,420.0,500.0,,,,,BODY FILTER,,5151.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0092,100,0,161,-83.75,GE,LightSpeed16,120.0,197.0,649.0,6.0,STANDARD,1.25,396.0,500.0,,,,,BODY FILTER,,6.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0096,104,0,109,-64.75,GE,LightSpeed16,120.0,265.0,1107.0,28.0,STANDARD,2.5,360.0,500.0,,,,,BODY FILTER,,28.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0099,107,0,44,-196.0,GE,LightSpeed16,120.0,400.0,526.0,18.0,STANDARD,1.25,400.0,500.0,,,,,BODY FILTER,,18.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0119,124,0,163,-213.5,SIEMENS,Sensation 16,120.0,140.0,500.0,93.0,B70f,2.0,277.0,500.0,,,,,0.0,,93.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0121,126,0,161,-118.75,GE,LightSpeed VCT,120.0,342.0,500.0,5.0,STANDARD,1.25,470.0,500.0,,,,,BODY FILTER,,5.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0126,131,0,88,-147.75,GE,LightSpeed Plus,120.0,400.0,570.0,4817.0,STANDARD,2.5,400.0,500.0,,,,,BODY FILTER,,4817.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0129,133,7,95,-188.5,GE,LightSpeed VCT,120.0,360.0,400.0,4.0,STANDARD,1.25,380.0,500.0,,0.984375,0.625,40.0,BODY FILTER,CT ANGIO CHEST W&W/O C,4.063492063492063,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0141,144,4,317,354.5,SIEMENS,Sensation 16,120.0,487.0,500.0,324.0,B70f,2.0,319.0,500.0,,,,,0.0,,324.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0144,147,0,23,-285.38501,GE,LightSpeed Plus,120.0,320.0,570.0,3747.0,STANDARD,2.5,380.0,500.0,,,,,BODY FILTER,,3747.0,suave,hann,benigno,evaluacion
+LIDC-IDRI-0148,151,1,82,-171.75,GE,LightSpeed16,120.0,265.0,1160.0,28.0,STANDARD,2.5,400.0,500.0,,0.9375,1.25,20.0,BODY FILTER,CT THORAX W/CONTRAST,29.866666666666667,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0153,155,0,57,-212.0,GE,LightSpeed VCT,120.0,570.0,400.0,14.0,STANDARD,2.5,460.0,500.0,,,,,BODY FILTER,,14.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0160,161,0,52,-202.0,GE,LightSpeed Plus,120.0,320.0,912.0,6225.0,LUNG,2.5,400.0,500.0,,,,,BODY FILTER,CT THORAX W/CONTRAST,6225.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0163,164,0,42,-258.75,GE,LightSpeed Plus,120.0,320.0,912.0,5927.0,LUNG,2.5,360.0,500.0,,,,,BODY FILTER,CT THORAX W/CONTRAST,5927.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0164,165,2,105,-215.75,GE,LightSpeed VCT,120.0,360.0,400.0,4.0,STANDARD,1.25,440.0,500.0,,0.984375,0.625,40.0,BODY FILTER,PE CHEST WITH,4.063492063492063,suave,hann,sospechoso,evaluacion
+LIDC-IDRI-0169,170,1,118,-126.25,GE,LightSpeed16,120.0,400.0,526.0,18.0,STANDARD,1.25,320.0,500.0,,1.375,0.625,10.0,BODY FILTER,CT ANGIO CHEST W&W/O C,13.090909090909092,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0171,172,0,21,-199.25,GE,LightSpeed Plus,120.0,400.0,570.0,4684.0,STANDARD,2.5,440.0,500.0,,,,,BODY FILTER,CT THORAX W/CONTRAST,4684.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0185,186,2,65,-203.75,GE,LightSpeed16,140.0,265.0,1160.0,28.0,STANDARD,2.5,400.0,500.0,,0.9375,1.25,20.0,BODY FILTER,CT-CH/A/P LIVER,29.866666666666667,suave,hann,benigno,evaluacion
+LIDC-IDRI-0193,194,0,75,-119.25,GE,LightSpeed16,120.0,265.0,1160.0,28.0,STANDARD,2.5,360.0,500.0,,0.9375,1.25,20.0,BODY FILTER,CT THORAX W/CONTRAST,29.866666666666667,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0195,196,0,37,-257.5,GE,LightSpeed16,120.0,320.0,1160.0,34.0,LUNG,2.5,340.0,500.0,,0.9375,1.25,20.0,BODY FILTER,CT THORAX W/CONTRAST,36.266666666666666,duro,ramp,sospechoso,evaluacion
+LIDC-IDRI-0196,197,0,100,-78.25,GE,LightSpeed Plus,120.0,350.0,570.0,4098.0,LUNG,2.5,320.0,500.0,,,,,BODY FILTER,CT THORAX W/O CONTRAST,4098.0,duro,ramp,sospechoso,evaluacion
+LIDC-IDRI-0203,204,0,41,-278.25,GE,LightSpeed Plus,120.0,400.0,570.0,5151.0,STANDARD,2.5,400.0,500.0,,,,,BODY FILTER,CH/ABD/PELVIS,5151.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0206,207,0,104,-300.75,GE,LightSpeed16,120.0,398.0,478.0,9.0,STANDARD,1.25,385.0,500.0,,1.375,1.25,20.0,BODY FILTER,CT CHEST W/O CON,6.545454545454546,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0211,212,0,79,-191.75,GE,LightSpeed VCT,120.0,360.0,400.0,4.0,STANDARD,1.25,380.0,500.0,,0.984375,0.625,40.0,BODY FILTER,CT CHEST PE,4.063492063492063,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0213,214,0,92,-106.25,GE,LightSpeed Plus,120.0,400.0,570.0,4484.0,STANDARD,2.5,380.0,500.0,,,,,BODY FILTER,T/A/P W/C,4484.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0217,218,1,83,-164.0,GE,LightSpeed VCT,120.0,443.0,800.0,22.0,LUNG,2.5,400.0,500.0,,0.984375,0.625,40.0,BODY FILTER,CT CAP W,22.349206349206348,duro,ramp,sospechoso,evaluacion
+LIDC-IDRI-0229,230,2,101,-125.5,GE,LightSpeed16,120.0,265.0,1160.0,28.0,LUNG,2.5,390.0,500.0,,0.9375,1.25,20.0,BODY FILTER,CT THORAX W/O CONTRAST,29.866666666666667,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0248,248,0,16,-270.0,GE,LightSpeed16,120.0,300.0,1160.0,32.0,LUNG,2.5,500.0,500.0,,0.9375,1.25,20.0,BODY FILTER,CT CAP,34.13333333333333,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0250,250,0,87,-137.25,GE,LightSpeed Plus,120.0,315.0,912.0,5834.0,STANDARD,2.5,420.0,500.0,,,,,BODY FILTER,CT THORAX W/CONTRAST,5834.0,suave,hann,sospechoso,evaluacion
+LIDC-IDRI-0256,256,0,47,-186.75,GE,LightSpeed16,120.0,300.0,1160.0,32.0,LUNG,2.5,370.0,500.0,,0.9375,1.25,20.0,BODY FILTER,CT  C/A/P  W/O CONT,34.13333333333333,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0257,257,0,68,-178.0,GE,LightSpeed16,120.0,300.0,1160.0,32.0,LUNG,2.5,400.0,500.0,,0.9375,1.25,20.0,BODY FILTER,CT C/A/P,34.13333333333333,duro,ramp,sospechoso,evaluacion
+LIDC-IDRI-0262,262,0,110,-161.5,GE,LightSpeed Ultra,120.0,80.0,554.0,771.0,BONE,1.25,321.0,500.0,,,,,BODY FILTER,CT GUIDED LUNG B,771.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0276,276,0,54,-222.0,GE,LightSpeed16,120.0,320.0,1160.0,34.0,LUNG,2.5,360.0,500.0,,0.9375,1.25,20.0,BODY FILTER,CT THORAX W/CONTRAST,36.266666666666666,duro,ramp,sospechoso,evaluacion
+LIDC-IDRI-0281,281,0,50,-209.25,GE,LightSpeed16,120.0,300.0,1160.0,32.0,LUNG,2.5,380.0,500.0,,0.9375,1.25,20.0,BODY FILTER,CT THORAX W/CONTRAST,34.13333333333333,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0284,284,2,111,-87.0,GE,LightSpeed Plus,120.0,320.0,912.0,5927.0,LUNG,2.5,420.0,500.0,,,,,BODY FILTER,CT THORAX W/CONTRAST,5927.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0287,287,0,78,-85.0,GE,LightSpeed16,120.0,300.0,1160.0,32.0,LUNG,2.5,400.0,500.0,,0.9375,1.25,20.0,BODY FILTER,CH-AB W/WO,34.13333333333333,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0289,289,0,28,-206.5,GE,LightSpeed16,120.0,300.0,1160.0,32.0,LUNG,2.5,460.0,500.0,,0.9375,1.25,20.0,BODY FILTER,CT THORAX W/CONTRAST,34.13333333333333,duro,ramp,benigno,evaluacion
+LIDC-IDRI-0294,294,1,104,-129.0,SIEMENS,Sensation 16,120.0,75.0,500.0,25.0,B30f,2.0,260.0,500.0,,,,,0.0,,25.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0298,298,2,248,-118.6,SIEMENS,Sensation 16,120.0,440.0,500.0,220.0,B45f,1.0,330.0,500.0,,,,,0.0,,220.0,intermedio,shepp-logan,benigno,evaluacion
+LIDC-IDRI-0309,309,1,190,-66.7,SIEMENS,Sensation 64,120.0,50.0,500.0,25.0,B30f,2.0,330.0,500.0,,,,,0.0,,25.0,suave,hann,sospechoso,evaluacion
+LIDC-IDRI-0312,312,0,53,-281.0,GE,LightSpeed Ultra,120.0,80.0,554.0,967.0,BONE,1.25,300.0,500.0,,,,,BODY FILTER,CT CHEST WO CONTRAST,967.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0313,313,0,173,-77.75,GE,LightSpeed Ultra,120.0,80.0,804.0,1505.0,BONE,1.25,359.0,500.0,,,,,BODY FILTER,CT GUIDED LUNG B,1505.0,duro,ramp,sospechoso,evaluacion
+LIDC-IDRI-0318,319,0,231,-186.8,SIEMENS,Sensation 16,120.0,75.0,,25.0,B30f,0.75,266.0,500.0,,,,,0.0,,25.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0321,322,2,178,-97.5,GE,LightSpeed Pro 16,120.0,80.0,526.0,3.0,BONE,1.25,340.0,500.0,,1.375,0.625,10.0,BODY FILTER,CT CHEST WO CONTRAST,2.1818181818181817,duro,ramp,benigno,evaluacion
+LIDC-IDRI-0348,350,1,118,-55.16,GE,LightSpeed Ultra,120.0,160.0,649.0,1966.0,STANDARD,2.5,370.0,500.0,,,,,BODY FILTER,,1966.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0358,361,5,171,-151.0,SIEMENS,Sensation 16,120.0,195.0,500.0,130.0,B70f,2.0,329.0,500.0,,,,,0.0,,130.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0363,366,0,121,-221.5,GE,LightSpeed Ultra,120.0,80.0,554.0,1041.0,BONE,1.25,360.0,500.0,,,,,BODY FILTER,CT LUNG SCREEN,1041.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0375,379,1,182,-129.085007,GE,LightSpeed Pro 16,120.0,160.0,478.0,825.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,,825.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0376,380,0,180,-168.744995,GE,LightSpeed16,120.0,160.0,478.0,1118.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,CHEST,1118.0,suave,hann,benigno,evaluacion
+LIDC-IDRI-0403,407,0,151,223.0,SIEMENS,Emotion 6,130.0,225.0,600.0,90.0,B20s,1.25,254.0,500.084,,,,,1.0,,90.0,suave,hann,benigno,evaluacion
+LIDC-IDRI-0407,411,1,96,867.7,SIEMENS,Sensation 16,120.0,75.0,500.0,25.0,B30f,2.0,340.0,500.0,,,,,0.0,,25.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0409,413,0,43,-379.5,PHILIPS,Brilliance 16P,120.0,413.0,,310.0,C,2.0,349.0,,,,,,C,,310.0,intermedio,shepp-logan,benigno,entrenamiento
+LIDC-IDRI-0411,415,2,152,-189.800003,GE,LightSpeed Pro 16,120.0,160.0,478.0,971.0,STANDARD,1.25,310.0,500.0,,,,,BODY FILTER,,971.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0415,419,6,131,-143.5,GE,LightSpeed Ultra,120.0,80.0,554.0,800.0,BONE,1.25,310.0,500.0,,,,,BODY FILTER,CT GUIDED LUNG BIOPSY,800.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0420,424,0,83,-211.3,SIEMENS,Sensation 64,120.0,50.0,500.0,25.0,B30f,2.0,340.0,500.0,,,,,0.0,,25.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0424,428,2,237,-82.5,SIEMENS,Sensation 64,120.0,342.0,500.0,171.0,B45f,1.0,300.0,500.0,,,,,0.0,,171.0,intermedio,shepp-logan,sospechoso,entrenamiento
+LIDC-IDRI-0427,431,0,135,-181.25,GE,LightSpeed Pro 16,120.0,160.0,478.0,3.0,STANDARD,1.25,380.0,500.0,,,,,BODY FILTER,CT THORAX WO IV CONTRA,3.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0430,434,1,188,-161.815002,GE,LightSpeed16,120.0,160.0,478.0,878.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,CHEST,878.0,suave,hann,benigno,evaluacion
+LIDC-IDRI-0433,437,2,161,-554.799988,PHILIPS,Brilliance 16P,140.0,350.0,,350.0,B,2.0,427.0,,,,,,B,,350.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0437,441,0,163,-217.419998,GE,LightSpeed16,120.0,160.0,478.0,1110.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,CHEST,1110.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0443,448,0,169,-232.875,GE,LightSpeed Pro 16,120.0,160.0,478.0,3.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,CT THORAX WO IV CONTRA,3.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0445,450,1,267,-90.0,SIEMENS,Sensation 64,120.0,488.0,500.0,244.0,B45f,1.0,280.0,500.0,,,,,0.0,,244.0,intermedio,shepp-logan,sospechoso,entrenamiento
+LIDC-IDRI-0450,455,7,170,-101.730003,GE,LightSpeed Ultra,120.0,80.0,504.0,880.0,BONE,1.25,275.0,500.0,,,,,BODY FILTER,CT CHEST O CONTR,880.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0456,461,0,132,-762.599976,PHILIPS,Brilliance 40,120.0,422.0,,250.0,C,1.5,346.0,,,,,,C,,250.0,intermedio,shepp-logan,benigno,evaluacion
+LIDC-IDRI-0463,468,1,357,-178.6,SIEMENS,Sensation 16,120.0,135.0,,45.0,B30f,0.75,340.0,500.0,,,,,0.0,,45.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0476,481,3,129,-154.0,GE,LightSpeed Ultra,120.0,80.0,804.0,1517.0,BONE,1.25,390.0,500.0,,,,,BODY FILTER,CT GUIDED LUNG B,1517.0,duro,ramp,benigno,evaluacion
+LIDC-IDRI-0481,486,0,81,-222.5,SIEMENS,Definition,120.0,561.0,500.0,280.0,B45f,1.0,310.0,500.0,,,,,0.0,,280.0,intermedio,shepp-logan,benigno,entrenamiento
+LIDC-IDRI-0485,491,1,109,-167.25,GE,LightSpeed VCT,120.0,360.0,400.0,4.0,STANDARD,1.25,380.0,500.0,,,,,BODY FILTER,,4.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0486,492,0,109,-566.5,PHILIPS,Brilliance 16P,120.0,240.0,,200.0,D,2.0,339.0,,,,,,D,,200.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0492,498,1,165,-270.999969,PHILIPS,Brilliance 64,120.0,297.0,,250.0,D,1.0,329.0,,,,,,D,,250.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0523,529,4,129,-84.5,GE,LightSpeed Ultra,120.0,80.0,554.0,641.0,BONE,1.25,360.0,500.0,,,,,BODY FILTER,CT GUIDED LUNG B,641.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0529,535,3,331,-141.684998,GE,LightSpeed Pro 16,120.0,160.0,478.0,1196.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,,1196.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0530,536,0,59,-198.345001,GE,LightSpeed Ultra,120.0,80.0,649.0,1012.0,STANDARD,2.5,300.0,500.0,,,,,BODY FILTER,CHEST,1012.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0537,543,0,117,-252.625,GE,LightSpeed Pro 16,120.0,160.0,478.0,1123.0,STANDARD,1.25,380.0,500.0,,,,,BODY FILTER,,1123.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0547,553,1,129,-44.220001,GE,LightSpeed Ultra,120.0,80.0,504.0,800.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,CHEST,800.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0552,558,0,55,-185.0,GE,LightSpeed QX/i,140.0,40.0,1140.0,920.0,BONE,2.5,285.0,500.0,,,,,BODY FILTER,CT LUNG SCREEN,920.0,duro,ramp,sospechoso,evaluacion
+LIDC-IDRI-0562,568,1,214,-467.900024,PHILIPS,Brilliance 16P,120.0,413.0,,310.0,D,2.0,314.0,,,,,,D,,310.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0568,574,1,161,-165.5,GE,LightSpeed Pro 16,120.0,220.0,956.0,32.0,STANDARD,2.5,360.0,500.0,,,,,BODY FILTER,CT THORAX W IV CONTRAS,32.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0576,582,2,205,960.800049,PHILIPS,Brilliance 64,120.0,356.0,,154.0,D,1.0,289.0,,,,,,D,,154.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0583,589,13,179,-498.299988,PHILIPS,Brilliance 16P,120.0,413.0,,310.0,B,2.0,327.0,,,,,,B,,310.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0587,592,4,199,-626.199951,PHILIPS,Brilliance 16P,120.0,240.0,,200.0,D,2.0,316.0,,,,,,D,,200.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0601,606,4,108,-747.900024,PHILIPS,Brilliance 16P,120.0,360.0,,177.0,D,1.0,344.0,,,,,,D,,177.0,duro,ramp,benigno,evaluacion
+LIDC-IDRI-0604,609,4,229,-143.384995,GE,LightSpeed16,120.0,160.0,478.0,878.0,STANDARD,1.25,300.0,500.0,,,,,BODY FILTER,,878.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0605,610,0,55,-238.360001,GE,LightSpeed Ultra,120.0,160.0,649.0,2037.0,STANDARD,2.5,360.0,500.0,,,,,BODY FILTER,CHEST,2037.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0608,613,0,140,-453.899994,PHILIPS,Brilliance 16P,120.0,300.0,,250.0,B,2.0,346.0,,,,,,B,,250.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0610,615,1,142,-61.384998,GE,LightSpeed Power,120.0,160.0,549.0,899.0,STANDARD,2.5,360.0,500.0,,,,,BODY FILTER,,899.0,suave,hann,sospechoso,evaluacion
+LIDC-IDRI-0614,619,2,418,-99.654999,GE,LightSpeed Pro 16,120.0,160.0,529.0,2221.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,CHEST,2221.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0617,622,1,181,-553.299988,PHILIPS,Brilliance 16P,120.0,360.0,,270.0,B,2.0,339.0,,,,,,B,,270.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0620,625,0,85,-221.994995,GE,LightSpeed Ultra,120.0,80.0,554.0,930.0,BONE,1.25,309.0,500.0,,,,,BODY FILTER,CT LUNG SCREEN,930.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0625,630,0,239,-244.7,SIEMENS,Sensation 16,120.0,105.0,,35.0,B30f,0.75,338.0,500.0,,,,,0.0,,35.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-1012,643,0,62,-167.455002,GE,LightSpeed Ultra,120.0,160.0,649.0,2061.0,STANDARD,2.5,370.0,500.0,,,,,BODY FILTER,CHEST,2061.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-1010,645,0,127,-199.5,GE,LightSpeed16,120.0,400.0,526.0,18.0,STANDARD,1.25,400.0,500.0,,1.375,0.625,10.0,BODY FILTER,CT ANGIO CHEST (NON-CO,13.090909090909092,suave,hann,benigno,entrenamiento
+LIDC-IDRI-1007,648,0,65,-230.5,SIEMENS,Sensation 64,120.0,50.0,500.0,25.0,B30f,2.0,330.0,500.0,,,,,0.0,,25.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-1004,651,2,383,-76.404999,GE,LightSpeed Ultra,120.0,160.0,554.0,2085.0,STANDARD,1.25,310.0,500.0,,,,,BODY FILTER,CHEST,2085.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-1003,652,1,103,-204.6,SIEMENS,Sensation 16,120.0,120.0,500.0,40.0,B30f,2.0,300.0,500.0,,,,,0.0,,40.0,suave,hann,benigno,evaluacion
+LIDC-IDRI-1002,653,0,142,-515.0,PHILIPS,Brilliance 16P,120.0,300.0,,250.0,D,2.0,285.0,,,,,,D,,250.0,duro,ramp,sospechoso,evaluacion
+LIDC-IDRI-0997,658,2,291,-232.8,SIEMENS,Sensation 16,120.0,105.0,,35.0,B30f,0.75,310.0,500.0,,,,,0.0,,35.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0963,692,0,217,-145.854996,GE,LightSpeed Pro 16,120.0,160.0,478.0,971.0,STANDARD,1.25,310.0,500.0,,,,,BODY FILTER,,971.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0942,713,1,92,-465.5,PHILIPS,Brilliance 40,120.0,412.0,,195.0,D,1.0,380.0,,,,,,D,,195.0,duro,ramp,sospechoso,evaluacion
+LIDC-IDRI-0939,716,2,374,-45.345001,GE,LightSpeed Ultra,120.0,160.0,554.0,1822.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,CT THORAX WO IV CONTRA,1822.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0933,722,4,98,-180.5,SIEMENS,Sensation 64,120.0,50.0,500.0,25.0,B30f,2.0,340.0,500.0,,,,,0.0,,25.0,suave,hann,benigno,evaluacion
+LIDC-IDRI-0919,736,0,67,-241.054993,GE,LightSpeed Ultra,120.0,80.0,554.0,952.0,BONE,1.25,290.0,500.0,,,,,BODY FILTER,CT CHEST O CONTR,952.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0916,739,7,67,-175.119995,GE,LightSpeed QX/i,140.0,50.0,912.0,850.0,BONE,2.5,340.0,500.0,,,,,BODY FILTER,CT LUNG SCREEN,850.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0913,742,2,321,-671.200012,PHILIPS,Brilliance 40,120.0,422.0,,250.0,C,1.5,270.0,,,,,,C,,250.0,intermedio,shepp-logan,sospechoso,entrenamiento
+LIDC-IDRI-0912,743,0,57,-641.300049,PHILIPS,Brilliance 16P,120.0,400.0,,300.0,B,2.0,425.0,,,,,,B,,300.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0905,750,0,164,-84.360001,GE,LightSpeed16,120.0,180.0,956.0,3368.0,STANDARD,2.5,280.0,500.0,,,,,BODY FILTER,,3368.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0902,753,0,93,-252.125,GE,LightSpeed Pro 16,120.0,160.0,478.0,3.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,CT THORAX WO IV CONTRA,3.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0895,760,2,451,-21.93,GE,LightSpeed16,120.0,160.0,478.0,1030.0,STANDARD,1.25,380.0,500.0,,,,,BODY FILTER,,1030.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0884,771,1,189,-85.0,GE,LightSpeed Ultra,120.0,80.0,554.0,948.0,BONE,1.25,340.0,500.0,,,,,BODY FILTER,CT LUNG SCREEN,948.0,duro,ramp,sospechoso,evaluacion
+LIDC-IDRI-0871,784,5,175,-107.584999,GE,LightSpeed Ultra,120.0,80.0,554.0,900.0,BONE,1.25,300.0,500.0,,,,,BODY FILTER,CT LUNG SCREEN,900.0,duro,ramp,benigno,evaluacion
+LIDC-IDRI-0866,789,1,53,-241.360001,GE,LightSpeed Ultra,120.0,80.0,504.0,880.0,BONE,1.25,360.0,500.0,,,,,BODY FILTER,CT CHEST O CONTR,880.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0863,792,0,193,-231.9,SIEMENS,Sensation 16,120.0,75.0,500.0,25.0,B30f,0.75,300.0,500.0,,,,,0.0,,25.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0860,795,0,83,-169.4,SIEMENS,Sensation 16,120.0,120.0,500.0,40.0,B30f,2.0,380.0,500.0,,,,,0.0,,40.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0858,797,2,177,-139.380005,GE,LightSpeed Ultra,120.0,160.0,554.0,1670.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,CHEST,1670.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0854,801,1,130,-165.389999,GE,LightSpeed16,120.0,160.0,478.0,885.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,CHEST,885.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0844,811,1,300,-74.894997,GE,LightSpeed16,120.0,160.0,478.0,972.0,STANDARD,1.25,380.0,500.0,,,,,BODY FILTER,,972.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0843,812,3,216,-250.3,SIEMENS,Sensation 16,120.0,150.0,,50.0,B30f,0.75,390.0,500.0,,,,,0.0,,50.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0838,817,0,120,-216.384995,GE,LightSpeed16,120.0,160.0,478.0,973.0,STANDARD,1.25,300.0,500.0,,,,,BODY FILTER,,973.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0835,820,1,137,-512.5,PHILIPS,Brilliance 16P,120.0,300.0,,250.0,B,2.0,276.0,,,,,,B,,250.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0826,829,0,373,-35.48,GE,LightSpeed Pro 16,120.0,160.0,478.0,992.0,STANDARD,1.25,380.0,500.0,,,,,BODY FILTER,,992.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0825,830,0,144,-170.0,SIEMENS,Sensation 64,120.0,163.0,500.0,81.0,B45f,1.0,280.0,500.0,,,,,0.0,,81.0,intermedio,shepp-logan,benigno,entrenamiento
+LIDC-IDRI-0822,833,6,184,-550.900024,PHILIPS,Brilliance 16P,120.0,240.0,,200.0,D,2.0,347.0,,,,,,D,,200.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0814,841,0,65,-567.200012,PHILIPS,Brilliance 16P,120.0,360.0,,300.0,D,1.0,268.0,,,,,,D,,300.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0807,848,3,250,-281.0,SIEMENS,Sensation 16,120.0,105.0,,35.0,B30f,0.75,332.0,500.0,,,,,0.0,,35.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0801,854,1,264,-167.7,SIEMENS,Sensation 16,120.0,75.0,,25.0,B30f,0.75,266.0,500.0,,,,,0.0,,25.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0800,855,1,110,232.5,GE,LightSpeed QX/i,140.0,40.0,1140.0,880.0,BONE,2.5,330.0,500.0,,,,,BODY FILTER,CT LUNG SCREEN,880.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0799,856,0,208,-59.5,GE,LightSpeed VCT,120.0,80.0,500.0,1.0,BONE,1.25,300.0,500.0,,0.984375,0.625,40.0,BODY FILTER,CT CHEST WO CONTRAST,1.0158730158730158,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0797,858,0,129,-189.160004,GE,LightSpeed Ultra,120.0,80.0,554.0,1059.0,BONE,1.25,360.0,500.0,,,,,BODY FILTER,CT LUNG SCREEN,1059.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0794,861,0,97,-648.0,PHILIPS,Brilliance 40,120.0,422.0,,250.0,C,1.5,327.0,,,,,,C,,250.0,intermedio,shepp-logan,benigno,entrenamiento
+LIDC-IDRI-0791,864,0,164,-212.0,SIEMENS,Sensation 64,120.0,91.0,500.0,75.0,B70f,2.0,341.0,500.0,,,,,0.0,,75.0,duro,ramp,benigno,entrenamiento
+LIDC-IDRI-0777,878,1,77,-183.2,SIEMENS,Sensation 64,120.0,50.0,500.0,25.0,B30f,2.0,340.0,500.0,,,,,0.0,,25.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0776,879,0,125,-200.3,SIEMENS,Sensation 16,120.0,421.0,500.0,230.0,B45f,1.0,340.0,500.0,,,,,0.0,,230.0,intermedio,shepp-logan,sospechoso,evaluacion
+LIDC-IDRI-0775,880,2,104,-239.1,SIEMENS,Sensation 16,120.0,440.0,500.0,220.0,B45f,1.0,300.0,500.0,,,,,0.0,,220.0,intermedio,shepp-logan,sospechoso,entrenamiento
+LIDC-IDRI-0759,896,1,50,-255.479996,GE,LightSpeed QX/i,140.0,40.0,1140.0,920.0,BONE,2.5,331.0,,,,,,BODY FILTER,,920.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0756,899,0,341,-88.334999,GE,LightSpeed16,120.0,160.0,478.0,1031.0,STANDARD,1.25,420.0,500.0,,,,,BODY FILTER,,1031.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0740,915,0,108,-192.0,SIEMENS,Sensation 64,120.0,50.0,500.0,25.0,B30f,2.0,290.0,500.0,,,,,0.0,,25.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0732,923,1,130,-104.8,SIEMENS,Sensation 16,120.0,75.0,500.0,25.0,B30f,2.0,340.0,500.0,,,,,0.0,,25.0,suave,hann,sospechoso,evaluacion
+LIDC-IDRI-0722,933,0,135,-253.365005,GE,LightSpeed Pro 16,120.0,80.0,478.0,505.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,,505.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0717,938,0,218,-208.9,SIEMENS,Sensation 16,120.0,75.0,,25.0,B30f,0.75,276.0,500.0,,,,,0.0,,25.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0700,955,0,305,-68.639999,GE,LightSpeed Pro 16,120.0,160.0,478.0,1036.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,,1036.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0698,957,0,337,-45.77,GE,LightSpeed Ultra,120.0,160.0,554.0,2025.0,STANDARD,1.25,360.0,500.0,,,,,BODY FILTER,CT THORAX WO IV CONTRA,2025.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0682,973,0,162,-189.684998,GE,LightSpeed Ultra,120.0,80.0,554.0,1145.0,BONE,1.25,368.0,500.0,,,,,BODY FILTER,CT LUNG SCREEN,1145.0,duro,ramp,sospechoso,evaluacion
+LIDC-IDRI-0678,977,0,106,-86.400002,GE,LightSpeed QX/i,120.0,50.0,912.0,900.0,STANDARD,2.5,270.0,500.0,,,,,BODY FILTER,,900.0,suave,hann,sospechoso,entrenamiento
+LIDC-IDRI-0671,984,2,195,-89.5,GE,LightSpeed Ultra,120.0,80.0,554.0,971.0,BONE,1.25,350.0,500.0,,,,,BODY FILTER,CT GUIDED LUNG B,971.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0660,995,4,135,-134.5,GE,LightSpeed Ultra,120.0,80.0,554.0,934.0,BONE,1.25,302.0,500.0,,,,,BODY FILTER,CT CHEST O CONTR,934.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0648,1007,2,503,-180.5,SIEMENS,Sensation 64,120.0,69.0,500.0,34.0,B31f,1.0,331.0,500.0,,,,,0.0,,34.0,suave,hann,benigno,entrenamiento
+LIDC-IDRI-0645,1010,0,109,-192.949997,GE,LightSpeed Ultra,120.0,80.0,554.0,930.0,BONE,1.25,300.0,500.0,,,,,BODY FILTER,CT LUNG SCREEN,930.0,duro,ramp,sospechoso,entrenamiento
+LIDC-IDRI-0641,1014,3,52,-147.475006,GE,LightSpeed Ultra,120.0,160.0,649.0,1942.0,STANDARD,2.5,330.0,500.0,,,,,BODY FILTER,CHEST,1942.0,suave,hann,benigno,entrenamiento

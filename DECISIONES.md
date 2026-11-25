@@ -49,7 +49,11 @@ Criterio general:
 | Iteraciones de SART | "Suele bastar una" | Con 180 vistas, sí. **Con 60 vistas, una iteración subestima las HU** (no convergió): se muestran 1 y 3 iteraciones |
 | ART | Método de la materia | **No implementado.** Requiere armar A (rayos × píxeles): ~92.000 × 262.144 para 512×512. SART resuelve el mismo sistema sin armar A |
 | Perímetro para circularidad y solidez | Área y perímetro de la región | Contar píxeles de borde subestima el perímetro de objetos chicos: un círculo perfecto de 5 mm daba circularidad 1,25 y uno de 20 mm 0,91, y en datos reales los benignos (chicos) salían con circularidad > 1. **Área y perímetro del mismo contorno sub-píxel** (isolínea 0,5 de la máscara apenas suavizada): el círculo da 0,96–0,99 en todos los tamaños y la circularidad no puede pasar de 1 |
-| Calcio como confundidor | — (no está en la materia) | Con 217 nódulos, el 57 % de los benignos tiene calcio (> 200 HU) contra el 17 % de los sospechosos, y las medidas que "separan más allá del tamaño" (contraste GLCM, asimetría, desvío, nitidez del borde) están arrastradas por el calcio. Pero el calcio es justamente lo que el radiólogo ya mira (y Lung-RADS ya clasifica como benigno): encontrarlo no es un hallazgo. **Se agrega el análisis `--sin-calcio` (05 y 06)**, que responde la pregunta clínica abierta: en nódulos sólidos SIN calcio, ¿algo separa más que el diámetro? |
+| Calcio como confundidor | — (no está en la materia) | Con 217 nódulos, el 57 % de los benignos tiene calcio (> 200 HU y más del 2 % del área) contra el 17 % de los sospechosos (en los 112 nódulos de desarrollo con segmentación aceptable: 61 % y 13 %). Las medidas que "separan más allá del tamaño" (contraste GLCM, asimetría, desvío, nitidez del borde) están asociadas al calcio: la separación se explica **en gran parte, no por completo**, por el calcio. Pero el calcio es justamente lo que el radiólogo ya mira (y Lung-RADS ya clasifica como benigno): encontrarlo no es un hallazgo. **Se agrega el análisis `--sin-calcio` (05 y 06)**, que responde la pregunta clínica abierta: en nódulos sólidos SIN calcio, ¿algo separa más que el diámetro? |
+| Umbrales del calcio (200 HU y 2 %) | — | Son una elección operativa, inspirada en el puntaje de Agatston (130 HU, área mínima de 1 mm²), no validada contra radiólogos. **Se varían** (script 09): el 2 % entre 0 y 10 % (AUC del diámetro sin calcio de 0,938 a 0,941) y los 200 HU entre 130 y 300 HU (0,931 a 0,942; nitidez del borde 0,51 a 0,55). Las conclusiones no cambian |
+| Textura sin los píxeles de calcio | — | Se recalculan las medidas del interior sin los píxeles de más de 200 HU (script 10). **El contraste (0,85) y la asimetría (0,86) no bajan**, así que no se afirma que "unos pocos píxeles de calcio inflan" esas medidas: la asociación es con el nódulo calcificado en conjunto. Varias medidas de textura cambiaron mucho o invirtieron el signo y no se interpretan en detalle (limitación) |
+| Dice contra cada radiólogo | Dice y Jaccard (4.11) | Contra el consenso el algoritmo parte con ventaja. El script 12 calcula el Dice contra cada radiólogo y lo compara con la concordancia entre radiólogos: **0,80 contra 0,835 entre radiólogos** (0,83 contra el consenso). El algoritmo queda cerca de los radiólogos, algo por debajo. Con el criterio justo los aceptables bajan de 112 a 92 (desarrollo) y de 25 a 18 (evaluación); el análisis principal se mantiene con el criterio original y se repite como control con los 92: las conclusiones sobre la baja dosis no cambian, pero la ventaja de la textura sobre el diámetro en la imagen original se achica de 0,09 a 0,04 de AUC (ver “Control: criterio de aceptabilidad” en la sección 6) |
+| Figura de la nitidez del borde | Sobel | El script 14 dibuja, para el nódulo de mayor nitidez (LIDC-IDRI-0822_s833_n6, 1042 HU/mm) y el de menor (LIDC-IDRI-0031_s42_n4, 184 HU/mm), el contorno, la banda de ~3 px donde se mide y el gradiente |
 | "Entorno solo" en el puntaje | — | El puntaje toma las k mejores medidas; si las del entorno son más débiles, "interior + entorno" sale idéntico a "interior" y no se sabe si el entorno tiene señal. Se agrega un puntaje solo con el entorno |
 | Radio del cierre del pulmón | — | Con 20/30/40 mm el Dice bajaba al crecer el radio y el mejor quedó en el borde de la grilla: se prueba 10/15/20/30 mm. Las fugas que quedan son de nódulos pegados al mediastino o al hilio: un disco grande rellena también esa concavidad |
 | Control por tamaño | Estratos de diámetro (anteproyecto) | En LIDC los benignos son casi todos < 10 mm y los sospechosos > 10 mm: con la muestra original casi no hay nódulos de tamaño parecido en los dos grupos y los estratos quedan vacíos. **Se amplía la muestra con todos los nódulos elegibles de 8 a 16 mm** (81 benignos y 75 sospechosos en total) y se compara dentro de ese rango (`--rango 8 16` en 05 y 06), con el diámetro de los radiólogos para no depender de la segmentación |
@@ -62,7 +66,7 @@ Criterio general:
 | Qué | Por qué |
 |---|---|
 | Remuestreo a 0,7 mm | Cada tomógrafo tiene otro tamaño de píxel. Sin esto, las medidas en píxeles no son comparables |
-| Consenso de radiólogos (≥ 50 %) y umbral de aceptabilidad | Referencia para validar: aceptable si Dice(algoritmo, consenso) ≥ Dice medio entre radiólogos |
+| Consenso de radiólogos (≥ 50 %) y umbral de aceptabilidad | Referencia para validar: aceptable si Dice(algoritmo, consenso) ≥ Dice medio entre radiólogos. **Esta comparación favorece al algoritmo**, porque el consenso se arma con los mismos radiólogos. Por eso el script 12 compara también contra cada radiólogo por separado (ver sección 3) |
 | División entrenamiento / evaluación por paciente | Ajustar con unos nódulos y evaluar con otros, sin que el mismo paciente quede en los dos |
 | Métricas de calidad de imagen | RMSE (en HU), PSNR (estándar en compresión, figura en el anteproyecto) y SSIM (distingue ruido de borroneo, que RMSE mezcla) |
 | Estadística (Mann-Whitney, AUC, Holm, estratos por tamaño, Spearman parcial) | El paso "comparación" con ~100 nódulos y ~40 medidas necesita una prueba que no suponga normalidad, corrección por comparaciones múltiples y dos controles del tamaño (confundidor), como promete el anteproyecto |
@@ -104,7 +108,7 @@ Un mAs de 7200 no es físico para un corte, Philips no informa el tiempo y Sieme
 
 - **Calibración por equipo.** Sin cilindro de agua por equipo, Φ es uno por fabricante. Los equipos de un mismo fabricante difieren entre sí: queda como dispersión, que se reporta.
 - **Bowtie y constante del tubo.** Ver sección 6.
-- **Ruido electrónico.** Sin medirlo en cada equipo, se usa un valor de literatura (Elhamiasl y Nuyts 2020 reportan ~29 fotones equivalentes en un equipo moderno). El 07 se puede correr `--sin-electronico` para ver cuánto cambia; el 07a lo pone a prueba en los estudios de LIDC que ya son de baja dosis, y ahí el valor de literatura no se sostiene para estos equipos (ver “Resultados con LIDC”).
+- **Ruido electrónico.** Sin medirlo en cada equipo, se usa un valor de literatura (Elhamiasl y Nuyts 2020 reportan ~29 fotones equivalentes en un equipo moderno). El 07 se puede correr `--sin-electronico` para ver cuánto cambia; el 07a lo pone a prueba en los estudios de LIDC que ya son de baja dosis, y además estima su valor con los propios datos de LIDC (ver “Resultados con LIDC”).
 - **Geometría.** El sinograma virtual es 2D, de haz paralelo, de un solo corte. El equipo real es de haz en abanico, helicoidal, con reconstrucción de cortes que mezclan filas. La cantidad de fotones se escala para que el ruido por píxel sea el mismo, pero la forma espacial del ruido es una aproximación.
 - **Lo que el ruido original tiene de no cuántico** (electrónico, artefactos) se trata como cuántico al anclar. Por eso conviene simular fracciones moderadas (½, ¼) con más confianza que 1/20.
 
@@ -211,7 +215,12 @@ El 07a también compara, dentro de cada modelo de tomógrafo, la dispersión de 
 - **Error al medir el ruido de una imagen:** mediana 4,5 %, P90 18,8 % (Christianson et al. 2015 reportan 3,4-4,7 %).
 - **Los equipos de un mismo modelo difieren de verdad.** Dentro de cada modelo de tomógrafo, la dispersión de Φ es entre 1,7 y 11 veces (mediana 4,4) la que daría solamente el error de medir el ruido. Un Φ por fabricante (lo que hace el anclaje `mas`) no alcanza a describir cada estudio; anclar con el ruido de cada imagen evita ese error.
 - **Parte del ruido que no baja con la dosis:** mediana 38 % (IC 95 % 22-56 %). Lo tomamos como **cota superior**: las diferencias de Φ entre equipos del punto anterior funcionan como error en la variable x del ajuste, y un error en x aplana la pendiente y agranda la ordenada b (dilución por regresión). El valor real es probablemente menor.
-- **Validación con los estudios que ya son de baja corriente** (93 cortes de ≤ 160 mA, con Φ calibrado solo con los de ≥ 301 mA). Error relativo del ruido predicho, (predicho − medido)/medido: **+24 % sin ruido electrónico** (P25 +11 %, P75 +42 %) y **+52 % con σe² = 30** (P25 +31 %, P75 +73 %). El modelo predice más ruido del que tienen las imágenes reales, y agregarle el ruido electrónico de literatura duplica el error. Estos estudios están a ~la mitad de la corriente de calibración, donde el ruido electrónico todavía debería pesar poco: que ya ahí empeore la predicción indica que σe² = 30 es alto para estos equipos. Una parte del +24 % viene del ruido no cuántico de los estudios de calibración, que hace que Φ salga más bajo.
+- **Validación con los estudios que ya son de baja corriente** (93 cortes de ≤ 160 mA, con Φ calibrado solo con los de ≥ 301 mA). Error relativo del ruido predicho, (predicho − medido)/medido: **+24 % sin ruido electrónico** (P25 +11 %, P75 +42 %) y **+52 % con σe² = 30** (P25 +31 %, P75 +73 %). El modelo predice más ruido del que tienen las imágenes reales, y agregarle el ruido electrónico de literatura duplica el error. Estos estudios están a ~la mitad de la corriente de calibración, donde el ruido electrónico todavía debería pesar poco: que ya ahí empeore la predicción sugiere que σe² = 30 es alto para estos equipos. Pero esta validación sola no alcanza para afirmarlo: sin electrónico ya se pasa un 24 %, en parte por el ruido no cuántico de los estudios de calibración (que hace que Φ salga más bajo), y mientras ese error no se separe del electrónico no se puede decir cuánto es cada uno. Para eso está la estimación conjunta del punto siguiente.
+
+- **Estudios de calibración y de validación** (tomografías reales de LIDC, separadas solo por la corriente con que se adquirieron): calibración, 60 estudios / 77 cortes (GE 40, Philips 13, Siemens 7), ≥ 301 mA (medianas 360, 412 y 440 mA); validación, 80 estudios / 93 cortes (GE 57, Siemens 23), ≤ 160 mA (medianas 160 y 75 mA). No hay Philips en la validación: todos los de la muestra son de ≥ 240 mA.
+- **Ruido electrónico estimado con LIDC.** Cada fuente de ruido cambia distinto con la corriente I: la cuántica como 1/I, la electrónica como 1/I² y la no cuántica no cambia. Con los 177 estudios (de 40 a 570 mA) se ajustan las tres a la vez, con Φ por fabricante, en escala logarítmica y con IC 95 % por bootstrap de estudios (500 remuestreos). Resultado: **σe² = 6 por lectura (IC 95 % 0 – 34)**; ruido no cuántico 9 HU de desvío (6,7 – 11,3). El valor de literatura (30) queda dentro del intervalo, cerca del borde: los datos no permiten descartarlo, pero el más probable es bastante menor. El intervalo es ancho porque el ajuste tiene un error de ±50 % por estudio (las diferencias de Φ entre equipos) y porque el electrónico pesa poco en casi todos los estudios (mediana 2,6 % del ruido; máximo 29 %, en el de menor corriente).
+  - *Validación del método antes de usarlo:* con datos sintéticos de verdad conocida y la misma dispersión de Φ entre estudios que mide el 07a, el ajuste recuperó σe² = 0 → 0,0 (0 – 3), 5 → 6,8 (0,2 – 24,5) y 30 → 40 (15 – 175): el intervalo contiene el valor verdadero en los tres casos. Una primera versión con residuos relativos subestimaba σe² cuando Φ varía entre equipos; la versión en escala logarítmica no tiene ese sesgo.
+  - *Limitación:* se ancla con mA y no con mAs. Si los protocolos de baja corriente compensaran sistemáticamente con rotaciones más lentas, parte del término 1/I² quedaría disimulado. No se puede descartar con LIDC.
 
 #### 07: los tres anclajes en los 217 nódulos (112 en la población de entrenamiento)
 
@@ -244,22 +253,43 @@ AUC transferido (puntaje "interior", armado con la original):
 
 La mayor fuente de incertidumbre de la simulación no es Φ ni el bowtie: es cuánto ruido electrónico tenían estos equipos, y pesa en ×1/10 y ×1/20. Coincide con lo que señalaba la devolución. Ese valor no está en el DICOM; lo acotamos con dos escenarios.
 
-#### Anclaje principal: `ruido`, con `hibrido` como cota pesimista
+#### Resultado principal: anclaje `hibrido` con el σe² estimado en LIDC (6), con 0 y 34 como extremos
 
-- Es el que menos supone: usa el ruido medido de cada estudio, en lugar de un Φ por fabricante que el 07a mostró que no describe bien a cada equipo (dispersión 4,4 veces el error de medición).
-- Su error principal, el de medir el ruido, es chico y está medido (4,5 %).
-- La validación del 07a indica que el ruido electrónico de literatura sobreestima el de estos equipos.
-- Pasa la verificación exacta σ0/√f en los nódulos reales.
+- Los fotones se anclan con el ruido medido en cada estudio, no con un Φ por fabricante: el 07a mostró que un Φ por fabricante no describe a cada equipo (dispersión 4,4 veces el error de medición), y la propagación de errores confirma que el anclaje por corriente × Φ exagera la reducción al doble (mediana de "×1/4" = 1/8,2) con un intervalo casi el doble de ancho que anclar por el ruido.
+- Incluye el ruido electrónico, como el método de Naziroglu y como pedía la devolución, con el valor que dan nuestros datos (σe² = 6) en lugar del de otro equipo.
+- Los extremos del rango compatible con los datos se reportan al lado: σe² = 0 (es el anclaje `ruido`, que además pasa la verificación exacta σ0/√f) y σe² = 33,7 (el límite superior del IC; prácticamente igual al híbrido con 30 de la literatura).
+- `mas` queda como referencia del método del paper sin calibración por equipo.
 
-`hibrido` se reporta al lado como el escenario de ruido electrónico alto. `mas` queda como referencia del método del paper.
+AUC transferido del puntaje "interior" / diámetro solo, en los tres escenarios de ruido electrónico:
+
+| σe² | ×1/2 | ×1/4 | ×1/10 | ×1/20 |
+|---|---|---|---|---|
+| 0 (`ruido`) | 0,934 / 0,842 | 0,908 / 0,839 | 0,862 / 0,840 | 0,819 / 0,823 |
+| **6 (principal)** | **0,936 / 0,842** | **0,915 / 0,841** | **0,824 / 0,822** | **0,760 / 0,822** |
+| 33,7 | 0,932 / 0,841 | 0,874 / 0,823 | 0,760 / 0,798 | 0,701 / 0,759 |
+
+Ruido agregado en el pulmón con el principal (mediana): 16, 30, 58 y 100 HU a ×1/2, ×1/4, ×1/10 y ×1/20. Dice medio 0,89 / 0,89 / 0,87 / 0,85; aceptables 96 / 94 / 84 / 76 %.
+
+**Conclusión, válida en todo el rango compatible con LIDC:** la ventaja de las medidas de textura sobre el diámetro se mantiene hasta ×1/4 y desaparece hacia ×1/10 (con el valor más probable quedan empatados, 0,824 contra 0,822); a ×1/20 el diámetro solo es igual o mejor.
+
+*Nota sobre el CCC del tamaño:* con el principal, el CCC del diámetro da 0,65 a ×1/10 y 0,83 a ×1/20. No es que el tamaño mejore con más ruido: el CCC del tamaño lo dominan unas pocas segmentaciones que se escapan al tejido vecino (dos o tres nódulos cambian el valor). El efecto del ruido sobre la segmentación se reporta con el Dice y la proporción de aceptables, que bajan de forma pareja.
 
 #### Qué conclusiones dependen del anclaje
 
 - **No dependen:** a ×1/2 no se pierde nada (AUC 0,91-0,93) y a ×1/4 la pérdida es chica (0,88-0,91). El tamaño y las HU medias son robustos; la textura de los anillos es lo más frágil; el ruido genera calcio espurio.
-- **Dependen del ruido electrónico:** si a ×1/10 el puntaje de textura queda por debajo del diámetro. Sin electrónico, no (0,862 contra 0,840); con electrónico, sí (0,758 contra 0,793). Se reporta como rango.
+- **Dependen del ruido electrónico:** el resultado exacto a ×1/10. Sin electrónico el puntaje de textura apenas le gana al diámetro (0,862 contra 0,840), con el valor más probable empatan (0,824 contra 0,822) y con el máximo pierde (0,760 contra 0,798). Se reporta como rango.
 - Con 112 nódulos, los IC 95 % por bootstrap del AUC van de ±0,04 a ±0,09, así que diferencias de 0,02-0,03 entre condiciones no son significativas.
 
 #### 08: puntaje robusto con dos criterios de dosis
+
+**Resultado principal (híbrido, σe² = 6).**
+
+- *Criterio ×1/4:* pasan 20 medidas del interior, prácticamente todas, y el puntaje robusto da **idéntico** al del 06 (AUC 0,938 / 0,936 / 0,915 / 0,824 / 0,760 en la original, ×1/2, ×1/4, ×1/10 y ×1/20). A un cuarto de la dosis el modelo ya es robusto y no hace falta recortarlo.
+- *Criterio ×1/10:* pasan solo 7 (nitidez del borde, HU media, desvío, calcio, energía, cluster shade y prominence) y el puntaje cae a 0,764 en la original y 0,751 a ×1/10, por debajo del diámetro (0,846 y 0,822) en todas las dosis. La causa: a ×1/10 el CCC del área (0,23) y del diámetro (0,65) sale bajo por unas pocas segmentaciones que se escapan al tejido vecino, y el criterio descarta justo el tamaño, la medida más informativa. En el subgrupo sin calcio, donde el tamaño sí pasa el filtro (CCC 1,00), el puntaje robusto se mantiene entre 0,90 y 0,92 hasta ×1/20, mientras el del 06 cae a 0,77.
+- *Conclusión:* el criterio por CCC funciona mientras no deje afuera al tamaño. A ×1/10, el CCC del tamaño no es confiable porque lo dominan pocas fugas de la segmentación; el efecto del ruido sobre el tamaño se describe mejor con el Dice y la proporción de aceptables.
+- *Calcio robusto (principal):* nódulos sin calcio que parecen calcificados con el umbral simple: 6 % a ×1/4, 20 % a ×1/10 y 45 % a ×1/20; con la medida robusta: 0 %, 7 % y 21 %. Detecta el 90–95 % de los calcificados reales, contra el 100 % del umbral simple.
+
+Los resultados de los anclajes `ruido` y `hibrido` con σe² = 30, a continuación, se mantienen como comparación.
 
 El puntaje robusto elige medidas con CCC ≥ 0,9 a una "dosis de uso" (el CCC no usa las etiquetas, así que este filtro no espía la clasificación) y AUC ≥ 0,7 **dentro de cada pliegue** de armado (`cv_robusto`), como pedía la devolución. Se corrió con dos dosis de uso (`--dosis-uso 4` y `--dosis-uso 10`) para ver cuánto depende de esa elección.
 
@@ -271,11 +301,62 @@ El puntaje robusto elige medidas con CCC ≥ 0,9 a una "dosis de uso" (el CCC no
 
 **Subgrupo sin calcio.** No se interpreta la comparación diámetro contra textura en ese subgrupo: excluir los calcificados saca 34 benignos y 7 sospechosos, los benignos que quedan son más chicos, y el diámetro mejora en buena parte por ese cambio de muestra (observación de la devolución). Además los intervalos son muy anchos.
 
+#### 13: la selección del puntaje robusto completamente dentro de cada pliegue
+
+La devolución señaló que el puntaje robusto elegía sus medidas con todo el conjunto de desarrollo. El filtro de AUC ya estaba dentro de cada pliegue; el 13 hace también el filtro de CCC dentro de cada pliegue (resultado principal):
+
+- *Criterio ×1/4:* el AUC da exactamente igual que en el 08 en todas las dosis (diferencia 0,000; sin calcio, entre −0,020 y +0,017).
+- *Criterio ×1/10:* da algo más alto que en el 08 (+0,045 en la original, +0,016 a ×1/10), porque dentro de algunos pliegues el tamaño sí pasa el filtro.
+
+Filtrar por CCC con todos los nódulos no le pasa información de las etiquetas al puntaje: el resultado del 08 no es optimista.
+
+#### 11: parámetros de adquisición de la muestra, y diferencia entre grupos
+
+178 estudios: 120 kVp (algunos de 140), corriente mediana 240 mA (40 – 570), espesor 1,5 mm (0,6 – 2,5). GE 123, Siemens 34, Philips 20, Toshiba 1; 23 modelos de tomógrafo. Kernels: suaves 111, duros 55, intermedios 12 (el más frecuente, STANDARD de GE, en 82). El CTDIvol no figura en ningún encabezado. LIDC mezcla tomografías diagnósticas y de tamizaje: no es una base de "dosis diagnóstica".
+
+**Los dos grupos no se adquirieron igual** (por nódulo):
+
+| | Benignos (109) | Sospechosos (108) |
+|---|---|---|
+| Corriente mediana | 195 mA | 265 mA |
+| Kernel duro | 24 % (26) | 37 % (40) |
+| Espesor mediano | 1,5 mm | 2,0 mm |
+
+Un kernel duro deja más textura de ruido y una corriente mayor deja menos ruido: parte de las diferencias de textura entre grupos puede venir de la adquisición y no del nódulo. No se corrige en el análisis; se reporta como **posible factor de confusión** de las medidas de textura (limitación).
+
+#### Control: criterio de aceptabilidad original (112) contra el justo (92)
+
+Se decidió mantener el análisis principal con el criterio original (112 nódulos de desarrollo), porque los 21 nódulos que el criterio justo deja afuera quedan a una mediana de 0,008 de Dice (máximo 0,048) de la concordancia entre radiólogos: son segmentaciones al nivel de un radiólogo, no fallas. Como control, `comparaciones/sensibilidad_aceptables.py` repite los AUC principales (diámetro, puntaje del interior y puntaje robusto, en la original y en cada dosis del resultado principal) con los 92 nódulos del criterio justo. Resultados (AUC [IC 95 %], criterio justo con 92 / original con 112):
+
+| | Diámetro solo | Puntaje del interior |
+|---|---|---|
+| original | 0,885 [0,81–0,94] / 0,846 [0,77–0,92] | 0,922 [0,87–0,97] / 0,938 [0,89–0,97] |
+| ×1/2 | 0,881 / 0,842 | 0,925 / 0,936 |
+| ×1/4 | 0,882 [0,81–0,94] / 0,841 [0,76–0,91] | 0,905 [0,84–0,96] / 0,915 [0,86–0,96] |
+| ×1/10 | 0,851 [0,76–0,92] / 0,822 [0,73–0,90] | 0,818 [0,72–0,91] / 0,824 [0,74–0,90] |
+| ×1/20 | 0,852 / 0,822 | 0,788 / 0,760 |
+
+(El puntaje robusto con criterio ×1/4 da idéntico al del interior con las dos poblaciones.) La mayor diferencia entre criterios es 0,041, menor que el ancho de cualquiera de los intervalos (±0,05 a ±0,10).
+
+- **No cambia:** el puntaje del interior es igual o mejor que el diámetro hasta ×1/4, y hacia ×1/10 la ventaja desaparece (con 92 el diámetro queda apenas por encima: 0,851 contra 0,818); a ×1/20 el diámetro es mejor.
+- **Sí cambia, y se reporta:** con los 92 el diámetro solo sube (0,846 → 0,885), así que la ventaja de la textura sobre el diámetro en la imagen original se achica de 0,09 a 0,04, con intervalos que se superponen. La ventaja de la textura a dosis completa depende de qué nódulos se incluyen y no es robusta a esa elección.
+
 #### Incertidumbre de la dosis real (`incertidumbre_dosis.py`)
 
 Diseño de la corrida: anclaje `ruido` con 110 nódulos y 50 sorteos por nódulo; `mas` e `hibrido` con 30 nódulos cada uno, porque solo se usan para comparar. Los nódulos se eligen alternando fabricante × familia de kernel, para no tomar todos del mismo equipo. El criterio de convergencia (que la mediana, P25 y P75 entre nódulos se muevan menos de ±5 % al agregar nódulos) no se alcanza con los nódulos disponibles: con 65 nódulos se mueven ±14 %, y bajan como 1/√n, así que con 110 se espera ~±10 % y con los 217, ~±7 %. Se reporta esa precisión junto con los intervalos.
 
-Resultados: se completan cuando termina la corrida.
+Dosis real de cada etiqueta (mediana; mitad central; IC 95 %):
+
+| Etiqueta | `ruido` (110 nódulos) | `hibrido`, σe² = 30 (30 nódulos) | `mas` (30 nódulos) |
+|---|---|---|---|
+| ×1/2 | 1/2,3; 1/1,9 – 1/2,8; 1/1,2 – 1/4,4 | 1/2,8; 1/2,3 – 1/3,4; 1/1,5 – 1/6,7 | 1/3,5; 1/2,6 – 1/5,1; 1/1,5 – 1/11,1 |
+| ×1/4 | 1/4,6; 1/3,4 – 1/6,0; 1/1,7 – 1/10,4 | 1/6,2; 1/4,7 – 1/8,1; 1/2,5 – 1/17,8 | 1/8,2; 1/5,6 – 1/12,7; 1/2,4 – 1/28,1 |
+| ×1/10 | 1/9,9; 1/6,7 – 1/13,8; 1/2,6 – 1/25,9 | 1/16,2; 1/11,5 – 1/22,7; 1/5,5 – 1/50 | 1/21,8; 1/14,0 – 1/35,0; 1/5,1 – 1/79,5 |
+| ×1/20 | 1/16,6; 1/10,4 – 1/24,3; 1/3,7 – 1/48 | 1/33,1; 1/22,3 – 1/47,6; 1/10,5 – 1/107 | 1/44,3; 1/27,8 – 1/72,9; 1/9,2 – 1/173 |
+
+Ancho del IC 95 % de ×1/4 (máx/mín): `ruido` 6,3, `hibrido` 7,1, `mas` 11,5. Sesgo de la mediana en ×1/4: +15 %, +54 % y +105 %. Qué explica la incertidumbre de ×1/4: con `ruido`, ruido electrónico 36 %, error al medir el ruido 27 %, ruido no cuántico 22 %, bowtie 7 %; con `mas`, el error de Φ explica el 74 %.
+
+Estos intervalos usan para σe² el rango 5 – 150 definido antes de estimarlo; el 07a lo acota a 0 – 34. Como la parte de 34 a 150 no es compatible con los datos, **los intervalos reportados son conservadores** (más anchos de lo necesario). No se repitió el análisis con el rango acotado. Tampoco se corrigió el anclaje por la fracción de ruido no cuántico: su estimación es una cota superior (inflada por la dispersión de Φ) y corregir con ella empeoraría el resultado; su efecto está incluido en estos intervalos y es probablemente la causa del +15 % de sesgo en ×1/4.
 
 
 ### Lo que no es un parámetro

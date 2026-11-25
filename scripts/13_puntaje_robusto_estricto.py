@@ -8,10 +8,12 @@ pacientes de prueba. Acá el CCC también se calcula SOLO con los pacientes de
 armado de cada pliegue, y recién después se elige por AUC.
 
 Compara contra el resultado del 08 (selección con todo el desarrollo).
-Salida: resultados/13_puntaje_robusto_estricto.csv
-Uso:    python scripts/13_puntaje_robusto_estricto.py
-Necesita resultados/07_baja_dosis.csv y resultados/caracteristicas.csv.
+Salida: resultados/13_puntaje_robusto_estricto{_anclaje_...}{_usoN}.csv
+Uso:    python scripts/13_puntaje_robusto_estricto.py [--anclaje ruido|mas|hibrido] [--dosis-uso 4|10] [--sigma-e2 lidc]
+        (por defecto el anclaje principal, ruido, y la dosis de uso del 08, x1/4)
+Necesita el 07 y el 08 corridos con el mismo anclaje y la misma dosis de uso.
 """
+import argparse
 import importlib.util
 import sys
 from pathlib import Path
@@ -65,7 +67,7 @@ def correr(df, etiqueta, k=5):
     y = (base.grupo == "sospechoso").to_numpy(int)
     pac = base.paciente.to_numpy()
     filas = []
-    for cond in ["original"] + E8.DOSIS[1:]:
+    for cond in ["original"] + E8.DOSIS:
         otra = E8.tabla(df, cond)[1].reset_index()
         s = cv_estricto(base, uso, otra, y, pac, interior, k)
         ok = np.isfinite(s)
@@ -77,17 +79,30 @@ def correr(df, etiqueta, k=5):
 
 
 def main():
-    df = E8.poblacion(pd.read_csv(C.DIR_RESULTADOS / "07_baja_dosis.csv"))
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--anclaje", choices=["mas", "ruido", "hibrido"], default="ruido")
+    ap.add_argument("--dosis-uso", type=int, default=4)
+    ap.add_argument("--sigma-e2", default=None,
+                    help="igual que en el 08: el σe² con el que se corrió el 07 (número, 'lidc' o 'lidc_sup')")
+    args = ap.parse_args()
+    E8.DOSIS_USO = f"dosis ×1/{args.dosis_uso}"
+    if E8.DOSIS_USO not in E8.DOSIS:
+        sys.exit(f"{E8.DOSIS_USO} no está entre las condiciones simuladas: {E8.DOSIS}")
+    a = {"mas": "", "ruido": "_anclaje_ruido", "hibrido": "_anclaje_hibrido"}[args.anclaje]
+    a += E8.sufijo_sigma_e2(args.sigma_e2, args.anclaje)
+    uso = "" if args.dosis_uso == 4 else f"_uso{args.dosis_uso}"
+    print(f"Anclaje: {args.anclaje} (resultados/07_baja_dosis{a}.csv) | dosis de uso: {E8.DOSIS_USO}")
+    df = E8.poblacion(pd.read_csv(C.DIR_RESULTADOS / f"07_baja_dosis{a}.csv"))
     sin = df[df.calcio_original <= C.FRAC_CALCIO_MAX]
     res = pd.concat([correr(df, "todos"), correr(sin, "sin calcio")], ignore_index=True)
     # lo que había en el 08 (selección con todo el desarrollo)
     for suf, nombre in (("", "todos"), ("_sincalcio", "sin calcio")):
-        r = pd.read_csv(C.DIR_RESULTADOS / f"08_puntaje_robusto{suf}.csv")
+        r = pd.read_csv(C.DIR_RESULTADOS / f"08_puntaje_robusto{a}{uso}{suf}.csv")
         r = r[r.puntaje == "interior robusto (propuesta)"].set_index("condicion").auc_transferido
         m = res.grupo_analisis == nombre
         res.loc[m, "auc_seleccion_en_08"] = res.loc[m, "condicion"].map(r).to_numpy()
     res["diferencia"] = res.auc_estricto - res.auc_seleccion_en_08
-    res.to_csv(C.DIR_RESULTADOS / "13_puntaje_robusto_estricto.csv", index=False)
+    res.to_csv(C.DIR_RESULTADOS / f"13_puntaje_robusto_estricto{a}{uso}.csv", index=False)
     pd.set_option("display.width", 200)
     print(res.round(3).to_string(index=False))
 

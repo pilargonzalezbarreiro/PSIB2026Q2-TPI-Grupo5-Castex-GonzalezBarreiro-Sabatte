@@ -22,6 +22,13 @@ HASTA elige hasta dónde correr:
            ×1/10 (sensibilidad del criterio) y la incertidumbre en versión
            acotada (ruido: 110 nódulos; corriente × Φ e híbrido: 30 cada uno).
            Retoma los nódulos que ya estaban hechos. Unas 4-5 h.
+  "final"  lo que falta para cerrar, con el resultado PRINCIPAL (híbrido con
+           el σe² estimado en LIDC): el 08 con las dos dosis de uso, el 11
+           (parámetros de adquisición) y el 13 (puntaje robusto con toda la
+           selección dentro de cada pliegue). Unos minutos.
+  "control"  repite los AUC principales con los 92 nódulos aceptables según el
+           criterio justo del script 12 (Dice contra cada radiólogo), para
+           ver si la elección del criterio cambia algo. Un par de minutos.
   "electronico"  estima el ruido electrónico con los datos de LIDC (07a) y
            corre el 07 híbrido con ese valor y con el límite superior de su
            intervalo. Correrlo DESPUÉS de que termine la incertidumbre. ~30 min.
@@ -33,7 +40,7 @@ import sys
 import time
 from pathlib import Path
 
-HASTA = "electronico"   # "07a", "prueba", "todo", "prueba_y_todo", "resto" o "electronico"
+HASTA = "control"   # "07a", "prueba", "todo", "prueba_y_todo", "resto", "electronico", "final" o "control"
 # Nódulos del análisis de incertidumbre: "auto" = se agregan de a uno hasta que
 # sumar más ya no cambia el resultado (ver comparaciones/incertidumbre_dosis.py)
 CASOS_INCERTIDUMBRE = "auto"
@@ -131,7 +138,26 @@ def electronico():
     ]
 
 
+def final():
+    """Cierre con el resultado principal (ver HASTA)."""
+    pasos = []
+    for uso in ("4", "10"):
+        pasos.append((f"08 propuesta (híbrido, σe² de LIDC, dosis de uso ×1/{uso})",
+                      ["scripts/08_propuesta.py", "--anclaje", "hibrido", "--sigma-e2", "lidc", "--dosis-uso", uso]))
+    pasos.append(("11 parámetros de adquisición", ["scripts/11_parametros_dicom.py"]))
+    for uso in ("4", "10"):
+        pasos.append((f"13 puntaje robusto estricto (híbrido, σe² de LIDC, dosis de uso ×1/{uso})",
+                      ["scripts/13_puntaje_robusto_estricto.py", "--anclaje", "hibrido", "--sigma-e2", "lidc",
+                       "--dosis-uso", uso]))
+    return pasos
+
+
 def pasos_de(hasta):
+    if hasta == "control":
+        return [("Control: AUC con el criterio de aceptabilidad original (112) y el justo (92)",
+                 ["comparaciones/sensibilidad_aceptables.py", "--anclaje", "hibrido", "--sigma-e2", "lidc"])]
+    if hasta == "final":
+        return final()
     if hasta == "resto":
         return resto()
     if hasta == "electronico":

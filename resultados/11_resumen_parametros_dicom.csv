@@ -1,0 +1,109 @@
+grupo,unidad,parametro,n,mediana,minimo,maximo,valor
+todos,estudios,kvp,178,120.0,120.0,140.0,
+todos,estudios,corriente_ma,178,240.0,40.0,570.0,
+todos,estudios,espesor_mm,178,1.5,0.6,2.5,
+todos,estudios,ctdivol_mgy,0,,,,
+todos,estudios,fabricante,123,,,,GE
+todos,estudios,fabricante,34,,,,SIEMENS
+todos,estudios,fabricante,20,,,,PHILIPS
+todos,estudios,fabricante,1,,,,TOSHIBA
+todos,estudios,modelo,42,,,,LightSpeed16
+todos,estudios,modelo,28,,,,LightSpeed Ultra
+todos,estudios,modelo,20,,,,Sensation 16
+todos,estudios,modelo,18,,,,LightSpeed Plus
+todos,estudios,modelo,14,,,,LightSpeed VCT
+todos,estudios,modelo,14,,,,LightSpeed Pro 16
+todos,estudios,modelo,14,,,,Brilliance 16P
+todos,estudios,modelo,12,,,,Sensation 64
+todos,estudios,modelo,6,,,,LightSpeed QX/i
+todos,estudios,modelo,4,,,,Brilliance 40
+todos,estudios,modelo,2,,,,Brilliance 64
+todos,estudios,modelo,1,,,,Aquilion
+todos,estudios,modelo,1,,,,Emotion 6
+todos,estudios,modelo,1,,,,Definition
+todos,estudios,modelo,1,,,,LightSpeed Power
+todos,estudios,kernel,82,,,,STANDARD
+todos,estudios,kernel,24,,,,BONE
+todos,estudios,kernel,20,,,,B30f
+todos,estudios,kernel,17,,,,LUNG
+todos,estudios,kernel,10,,,,D
+todos,estudios,kernel,7,,,,B45f
+todos,estudios,kernel,6,,,,B
+todos,estudios,kernel,4,,,,B70f
+todos,estudios,kernel,4,,,,C
+todos,estudios,kernel,1,,,,B50f
+todos,estudios,kernel,1,,,,FC10
+todos,estudios,kernel,1,,,,B20s
+todos,estudios,kernel,1,,,,B31f
+todos,estudios,familia_kernel,111,,,,suave
+todos,estudios,familia_kernel,55,,,,duro
+todos,estudios,familia_kernel,12,,,,intermedio
+benigno,nódulos,kvp,109,120.0,120.0,140.0,
+benigno,nódulos,corriente_ma,109,195.0,40.0,561.0,
+benigno,nódulos,espesor_mm,109,1.5,0.75,2.5,
+benigno,nódulos,ctdivol_mgy,0,,,,
+benigno,nódulos,fabricante,71,,,,GE
+benigno,nódulos,fabricante,24,,,,SIEMENS
+benigno,nódulos,fabricante,13,,,,PHILIPS
+benigno,nódulos,fabricante,1,,,,TOSHIBA
+benigno,nódulos,modelo,25,,,,LightSpeed16
+benigno,nódulos,modelo,16,,,,Sensation 16
+benigno,nódulos,modelo,15,,,,LightSpeed Ultra
+benigno,nódulos,modelo,12,,,,LightSpeed Plus
+benigno,nódulos,modelo,11,,,,LightSpeed Pro 16
+benigno,nódulos,modelo,10,,,,Brilliance 16P
+benigno,nódulos,modelo,6,,,,LightSpeed VCT
+benigno,nódulos,modelo,6,,,,Sensation 64
+benigno,nódulos,modelo,2,,,,Brilliance 40
+benigno,nódulos,modelo,2,,,,LightSpeed QX/i
+benigno,nódulos,modelo,1,,,,Aquilion
+benigno,nódulos,modelo,1,,,,Emotion 6
+benigno,nódulos,modelo,1,,,,Definition
+benigno,nódulos,modelo,1,,,,Brilliance 64
+benigno,nódulos,kernel,54,,,,STANDARD
+benigno,nódulos,kernel,15,,,,B30f
+benigno,nódulos,kernel,10,,,,BONE
+benigno,nódulos,kernel,7,,,,LUNG
+benigno,nódulos,kernel,5,,,,B
+benigno,nódulos,kernel,5,,,,D
+benigno,nódulos,kernel,4,,,,B70f
+benigno,nódulos,kernel,3,,,,B45f
+benigno,nódulos,kernel,3,,,,C
+benigno,nódulos,kernel,1,,,,FC10
+benigno,nódulos,kernel,1,,,,B20s
+benigno,nódulos,kernel,1,,,,B31f
+benigno,nódulos,familia_kernel,77,,,,suave
+benigno,nódulos,familia_kernel,26,,,,duro
+benigno,nódulos,familia_kernel,6,,,,intermedio
+sospechoso,nódulos,kvp,108,120.0,120.0,140.0,
+sospechoso,nódulos,corriente_ma,108,265.0,40.0,570.0,
+sospechoso,nódulos,espesor_mm,108,2.0,0.6,2.5,
+sospechoso,nódulos,ctdivol_mgy,0,,,,
+sospechoso,nódulos,fabricante,78,,,,GE
+sospechoso,nódulos,fabricante,19,,,,SIEMENS
+sospechoso,nódulos,fabricante,11,,,,PHILIPS
+sospechoso,nódulos,modelo,30,,,,LightSpeed16
+sospechoso,nódulos,modelo,18,,,,LightSpeed Ultra
+sospechoso,nódulos,modelo,12,,,,LightSpeed Plus
+sospechoso,nódulos,modelo,10,,,,LightSpeed VCT
+sospechoso,nódulos,modelo,10,,,,Sensation 16
+sospechoso,nódulos,modelo,8,,,,Brilliance 16P
+sospechoso,nódulos,modelo,7,,,,Sensation 64
+sospechoso,nódulos,modelo,4,,,,LightSpeed QX/i
+sospechoso,nódulos,modelo,3,,,,LightSpeed Pro 16
+sospechoso,nódulos,modelo,2,,,,Definition
+sospechoso,nódulos,modelo,2,,,,Brilliance 40
+sospechoso,nódulos,modelo,1,,,,Brilliance 64
+sospechoso,nódulos,modelo,1,,,,LightSpeed Power
+sospechoso,nódulos,kernel,45,,,,STANDARD
+sospechoso,nódulos,kernel,17,,,,BONE
+sospechoso,nódulos,kernel,16,,,,LUNG
+sospechoso,nódulos,kernel,10,,,,B30f
+sospechoso,nódulos,kernel,8,,,,B45f
+sospechoso,nódulos,kernel,7,,,,D
+sospechoso,nódulos,kernel,3,,,,B
+sospechoso,nódulos,kernel,1,,,,B50f
+sospechoso,nódulos,kernel,1,,,,C
+sospechoso,nódulos,familia_kernel,58,,,,suave
+sospechoso,nódulos,familia_kernel,40,,,,duro
+sospechoso,nódulos,familia_kernel,10,,,,intermedio
