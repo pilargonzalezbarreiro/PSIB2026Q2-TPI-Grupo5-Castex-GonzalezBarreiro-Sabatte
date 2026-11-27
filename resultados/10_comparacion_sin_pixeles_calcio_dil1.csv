@@ -1,0 +1,11 @@
+medida,auc_con_calcio_pixeles,mayor_en_con_calcio_pixeles,auc_sin_pixeles_calcio,mayor_en_sin_pixeles_calcio,auc_sin_px_calcio_subgrupo_sin_calcio,spearman_parcial_vs_tamano_sc
+hu_asimetria,0.855,benigno,0.859,benigno,0.768,-0.494
+hu_desvio,0.68,benigno,0.772,sospechoso,0.778,0.306
+hu_curtosis,0.71,sospechoso,0.643,sospechoso,0.724,0.039
+glcm_energia,0.64,benigno,0.549,sospechoso,0.676,-0.096
+glcm_entropia,0.659,sospechoso,0.612,sospechoso,0.514,0.207
+glcm_contraste,0.849,benigno,0.706,benigno,0.693,-0.154
+glcm_homogeneidad,0.556,sospechoso,0.833,sospechoso,0.818,0.338
+glcm_correlacion,0.807,sospechoso,0.899,sospechoso,0.889,0.494
+glcm_cluster_shade,0.602,sospechoso,0.867,benigno,0.845,-0.494
+glcm_cluster_prominence,0.628,benigno,0.87,sospechoso,0.892,0.438
