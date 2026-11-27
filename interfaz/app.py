@@ -4,13 +4,16 @@ Cada pestaña es una etapa del trabajo y usa EXACTAMENTE las funciones del
 pipeline (paquete tpi/ y scripts), así lo que se ve es lo que calcula el TP:
 
   1. Imagen        corte, histograma de HU y ruido de la imagen (análisis)
-  2. Reconstrucción Radon, sinograma, SBP / FBP (rampa, Hann) / SART
-  3. Filtros       mediana, gaussiano y Wiener sobre una imagen con ruido
-  4. Segmentación  crecimiento de regiones paso a paso, Dice, Otsu
-  5. Características forma, intensidad, GLCM, borde, calcio, entorno
-  6. Clasificación puntaje (06) armado sin el paciente de este nódulo
-  7. Baja dosis y compresión  simulación de Naziroglu et al. (2017) y JPEG
+  2. Segmentación  crecimiento de regiones paso a paso, Dice, Otsu
+  3. Características forma, intensidad, GLCM, borde, calcio, entorno
+  4. Clasificación puntaje (06) armado sin el paciente de este nódulo
+  5. Baja dosis y compresión  simulación de Naziroglu et al. (2017) y JPEG
+  6. Reconstrucción Radon, sinograma, SBP / FBP (rampa, Hann) / SART (exploratoria)
+  7. Filtros       mediana, gaussiano y Wiener sobre una imagen con ruido (exploratoria)
   8. Resultados    las figuras globales del trabajo
+
+Las etapas se eligen por NOMBRE (constantes E_*), no por posición: para
+reordenarlas alcanza con cambiar la lista ORDEN_ETAPAS.
 
 Se abre con abrir_interfaz.py (botón ▶) o con:  streamlit run interfaz/app.py
 Necesita datos/cortes/*.npz y resultados/caracteristicas.csv.
@@ -278,16 +281,27 @@ d = cargar(fila.archivo)
 T0, R0 = parametros_segmentacion()
 px = float(d["pixel_mm_original"])
 
-ETAPAS = ["1 · Imagen", "2 · Reconstrucción", "3 · Filtros", "4 · Segmentación",
-          "5 · Características", "6 · Clasificación", "7 · Baja dosis y compresión", "8 · Resultados"]
+E_IMAGEN = "Imagen"
+E_SEGMENTACION = "Segmentación"
+E_CARACTERISTICAS = "Características"
+E_CLASIFICACION = "Clasificación"
+E_DOSIS = "Baja dosis y compresión"
+E_RECONSTRUCCION = "Reconstrucción"
+E_FILTROS = "Filtros"
+E_RESULTADOS = "Resultados"
+# Orden en pantalla: primero el recorrido principal del trabajo y después las dos
+# etapas exploratorias de la materia (reconstrucción y filtros).
+ORDEN_ETAPAS = [E_IMAGEN, E_SEGMENTACION, E_CARACTERISTICAS, E_CLASIFICACION, E_DOSIS,
+                E_RECONSTRUCCION, E_FILTROS, E_RESULTADOS]
 # Solo se calcula la etapa elegida (con pestañas, Streamlit calcularía todas en cada cambio)
-etapa = st.radio("Etapa del trabajo", ETAPAS, horizontal=True, label_visibility="collapsed")
+etapa = st.radio("Etapa del trabajo", ORDEN_ETAPAS, horizontal=True, label_visibility="collapsed",
+                 format_func=lambda e: f"{ORDEN_ETAPAS.index(e) + 1} · {e}")
 st.divider()
 
 # ===========================================================================
-# 1. Imagen
+# Etapa: Imagen
 # ===========================================================================
-if etapa == ETAPAS[0]:
+if etapa == E_IMAGEN:
     st.subheader("El corte de trabajo")
     st.write("El corte de LIDC con mayor área del nódulo, remuestreado a 0,7 mm y recortado a "
              f"{C.ROI_MM:g} mm alrededor del nódulo. Los contornos son de cada radiólogo (colores) y el "
@@ -302,11 +316,11 @@ if etapa == ETAPAS[0]:
     for k, m in enumerate(d["radiologos"]):
         contorno(ax[1], m, plt.cm.tab10(k), 1.0)
     contorno(ax[1], d["consenso"], "w", 1.6)
-    ax[1].set_title("Recorte con los radiólogos", fontsize=9)
+    ax[1].set_title("Lo que marcó cada radiólogo (colores) y el consenso (blanco)", fontsize=9)
     z = zoom_alrededor(d["consenso"])
     ax[2].imshow(d["img"][z], **VENTANA)
     contorno(ax[2], d["consenso"][z], "w", 1.6)
-    ax[2].set_title("Zoom al nódulo", fontsize=9)
+    ax[2].set_title("Consenso de los radiólogos", fontsize=9)
     sin_ejes(ax)
     mostrar(fig)
 
@@ -333,7 +347,7 @@ if etapa == ETAPAS[0]:
         st.metric("Ruido global (moda del desvío local en tejido blando)", f"{s0:.1f} HU")
         st.write("Se mide como Christianson et al. (2015): el desvío en ventanas de ~6 mm sobre tejido blando "
                  "homogéneo, y la moda de esos desvíos. En el parénquima no sirve, porque la textura del "
-                 "pulmón se confunde con ruido. Este valor ancla la simulación de baja dosis (pestaña 7).")
+                 "pulmón se confunde con ruido. Este valor ancla la simulación de la etapa «Baja dosis y compresión».")
         fig, ax = figura(1, 2.6, 5)
         ax[0].imshow(d["corte_completo_rem"], **VENTANA)
         ax[0].imshow(np.ma.masked_where(~tejido, tejido), cmap="autumn", alpha=0.5)
@@ -342,24 +356,38 @@ if etapa == ETAPAS[0]:
         mostrar(fig)
 
 # ===========================================================================
-# 2. Reconstrucción
+# Etapa: Reconstrucción
 # ===========================================================================
-if etapa == ETAPAS[1]:
+if etapa == E_RECONSTRUCCION:
     st.subheader("Reconstrucción tomográfica")
-    st.write("Se simula la adquisición del corte: HU → μ, transformada de Radon (sinograma, Beer-Lambert) "
-             "y se reconstruye con cada método de la materia. Sirve para comparar MÉTODOS de reconstrucción; "
-             "la simulación de dosis del trabajo está en la pestaña 7.")
+    st.write("Etapa exploratoria: se simula la adquisición del corte (HU → μ, transformada de Radon, "
+             "Beer-Lambert) y se reconstruye con cada método de la materia, para comparar MÉTODOS de "
+             "reconstrucción. La simulación de dosis del trabajo es otra cosa y está en la etapa "
+             "«Baja dosis y compresión».")
+    st.caption("**Qué ruido se agrega acá y por qué.** Es ruido de Poisson en el sinograma: para cada rayo se "
+               "sortea cuántos fotones llegan al detector (I₀·e^(−∫μ) en promedio) y se vuelve a calcular la "
+               "proyección con esa cantidad. Es el mismo modelo físico que usa la etapa de baja dosis, pero con "
+               "un I₀ nominal, igual para todos los nódulos, que no corresponde a la dosis de ningún estudio. "
+               "Para comparar métodos no hace falta que corresponda: lo que importa es que todos reconstruyan "
+               "exactamente el mismo sinograma ruidoso, así las diferencias son del método. Por la misma razón "
+               "se reconstruye el sinograma completo (imagen más ruido), porque interesa ver también el error "
+               "propio de cada método y no solo el ruido. Para ir más rápido se usa un recorte de 18 cm "
+               "alrededor del nódulo y no el corte entero: los rayos atraviesan menos tejido que en el tórax "
+               "real, así que con el mismo I₀ el ruido sale menor que en la tabla del informe. Sirve para "
+               "comparar métodos entre sí, no por sus valores absolutos.")
     c1, c2, c3, c4 = st.columns(4)
     metodo = c1.selectbox("Método", ["FBP (rampa)", "FBP (Hann)", "SBP", "SART"])
     n_ang = c2.select_slider("Proyecciones (en 180°)", [30, 60, 90, 180, 360], value=180)
     it = c3.slider("Iteraciones de SART", 1, 5, 1, disabled=metodo != "SART")
-    ruido_rec = c4.select_slider("Fotones por rayo (I0)", ["sin ruido", "1e6", "1e5", "2.5e4", "1e4"],
-                                 value="sin ruido")
+    # I₀: fotones que salen del tubo por rayo. "∞" = no se agrega ruido de Poisson.
+    FOTONES = {"∞ (sin ruido)": None, "10⁶": 1e6, "10⁵": 1e5, "2,5·10⁴": 2.5e4, "10⁴": 1e4}
+    ruido_rec = c4.select_slider("I₀: fotones que salen del tubo por rayo (menos fotones = más ruido)",
+                                 list(FOTONES), value="∞ (sin ruido)")
     if st.button("Reconstruir", type="primary"):
         with st.spinner("Reconstruyendo (SART con muchas proyecciones tarda unos segundos)..."):
             met, filtro = {"FBP (rampa)": ("fbp", "ramp"), "FBP (Hann)": ("fbp", "hann"),
                            "SBP": ("sbp", "ramp"), "SART": ("sart", "ramp")}[metodo]
-            I0 = None if ruido_rec == "sin ruido" else float(ruido_rec)
+            I0 = FOTONES[ruido_rec]
             # recorte cuadrado del corte remuestreado alrededor del nódulo (más rápido que 512 x 512)
             lado = 256
             ref = _recortar(d["corte_completo_rem"], tuple(d["semilla_completo"]), lado, -1000.0)
@@ -394,14 +422,16 @@ if etapa == ETAPAS[1]:
         else:
             rmse = float(np.sqrt(np.mean((rec - ref)[fov] ** 2)))
             st.metric("Error RMS dentro del campo de visión", f"{rmse:.1f} HU")
-        st.caption("En el trabajo, con 60 proyecciones SART da ~74 HU de error aun sin ruido, contra ~25 HU de "
-                   "FBP con 180 (Tabla A3): por eso la baja dosis se simula con menos fotones y no con menos "
-                   "proyecciones (Byl et al. 2023). ART no se implementa: requiere armar la matriz del sistema.")
+        st.caption("Qué mirar: con pocas proyecciones (30-60) aparecen rayas que salen de las estructuras de "
+                   "alto contraste; FBP con Hann baja el ruido respecto de la rampa a costa de suavizar el "
+                   "borde; SART con una iteración todavía no convergió (las HU quedan bajas en los bordes "
+                   "fuertes) y al iterar converge, pero con datos ruidosos también empieza a reproducir el "
+                   "ruido. ART no se implementa: requiere armar la matriz del sistema.")
 
 # ===========================================================================
-# 3. Filtros
+# Etapa: Filtros
 # ===========================================================================
-if etapa == ETAPAS[2]:
+if etapa == E_FILTROS:
     st.subheader("Mejoramiento: filtros convencionales y óptimos")
     st.write("Los filtros se prueban sobre una versión ruidosa del corte (baja dosis simulada), porque la "
              "imagen original ya tiene poco ruido. En el pipeline NO se filtra antes de medir.")
@@ -461,9 +491,9 @@ if etapa == ETAPAS[2]:
                "puede premiar un suavizado que destruye bordes: por eso se miran las tres.")
 
 # ===========================================================================
-# 4. Segmentación
+# Etapa: Segmentación
 # ===========================================================================
-if etapa == ETAPAS[3]:
+if etapa == E_SEGMENTACION:
     st.subheader("Segmentación por crecimiento de regiones")
     c1, c2 = st.columns(2)
     T = c1.slider("Umbral T (HU): crece por los píxeles con HU > T", -700, -250, int(T0), 25)
@@ -525,9 +555,9 @@ if etapa == ETAPAS[3]:
                "radiólogos; la comparación justa es contra cada uno.")
 
 # ===========================================================================
-# 5. Características
+# Etapa: Características
 # ===========================================================================
-if etapa == ETAPAS[4]:
+if etapa == E_CARACTERISTICAS:
     st.subheader("Características del nódulo")
     seg, cruda = segmentar(d, T0, R0)
     if seg.sum() < 5:
@@ -549,7 +579,7 @@ if etapa == ETAPAS[4]:
                                               else "sospechosos")})
         st.dataframe(pd.DataFrame(filas).style.format(precision=3), hide_index=True, width="stretch")
         st.caption("Medianas de los 112 nódulos de desarrollo con segmentación aceptable. Que este nódulo se "
-                   "parezca a un grupo en una medida no lo clasifica: eso lo hace el puntaje (pestaña 6).")
+                   "parezca a un grupo en una medida no lo clasifica: eso lo hace el puntaje (etapa «Clasificación»).")
 
         st.markdown("**Cómo se mide cada grupo de características**")
         z = zoom_alrededor(seg, 26)
@@ -604,9 +634,9 @@ if etapa == ETAPAS[4]:
             mostrar(fig)
 
 # ===========================================================================
-# 6. Clasificación
+# Etapa: Clasificación
 # ===========================================================================
-if etapa == ETAPAS[5]:
+if etapa == E_CLASIFICACION:
     st.subheader("Clasificación: el puntaje combinado")
     st.write("El puntaje del script 06 elige las k medidas que mejor separan (sin repetir medidas muy "
              "correlacionadas), las estandariza y las promedia con su signo. Acá se arma con los nódulos de "
@@ -656,9 +686,9 @@ if etapa == ETAPAS[5]:
                "el que vale es el de validación cruzada.")
 
 # ===========================================================================
-# 7. Baja dosis y compresión
+# Etapa: Baja dosis y compresión
 # ===========================================================================
-if etapa == ETAPAS[6]:
+if etapa == E_DOSIS:
     st.subheader("Robustez: baja dosis (Naziroglu et al. 2017) y compresión")
     se_lidc, se_sup = sigma_e2_lidc()
     c1, c2 = st.columns([1.2, 1])
@@ -751,6 +781,22 @@ if etapa == ETAPAS[6]:
                "para llegar a esa fracción de la dosis (compensando el que la imagen ya trae: N·f/(1−f)), ruido "
                "electrónico y reconstrucción SOLO del ruido con la ventana del kernel del equipo. Los fotones se "
                "anclan con el ruido medido en la imagen (anclaje híbrido, el resultado principal).")
+    rec_cmp = leer_csv("comparaciones/reconstruccion.csv")
+    if rec_cmp is not None:
+        rmse_cond = rec_cmp.groupby("condicion")["rmse"].mean()
+        con_180 = rmse_cond.get("FBP rampa 180, dosis ref")
+        con_60 = rmse_cond.get("FBP rampa 60, dosis ref")
+    else:
+        con_180 = con_60 = None
+    datos_proy = (f" En nuestra comparación de métodos (`comparaciones/reconstruccion.py`, etapa "
+                  f"«Reconstrucción»), a igual ruido (I₀ = 10⁵), FBP rampa da {con_180:.1f} HU de error con 180 "
+                  f"proyecciones y {con_60:.1f} HU con 60: sacar proyecciones duplica el error y agrega rayas, "
+                  "un tipo de error que una tomografía de baja dosis real no tiene."
+                  if con_180 is not None and con_60 is not None else "")
+    st.caption("**Por qué se bajan los fotones y no las proyecciones.** Byl et al. (2023) compararon bajar la "
+               "corriente del tubo con bajar la cantidad de proyecciones a igual dosis, y concluyen que conviene "
+               "bajar la corriente: con menos proyecciones aparecen artefactos de submuestreo que no se corrigen "
+               "bien." + datos_proy)
 
     res = leer_csv("07_clasificacion_anclaje_hibrido_se6.csv")
     seg07 = leer_csv("07_segmentacion_anclaje_hibrido_se6.csv")
@@ -761,9 +807,9 @@ if etapa == ETAPAS[6]:
                 st.dataframe(res, hide_index=True, width="stretch")
 
 # ===========================================================================
-# 8. Resultados
+# Etapa: Resultados
 # ===========================================================================
-if etapa == ETAPAS[7]:
+if etapa == E_RESULTADOS:
     st.subheader("Resultados globales del trabajo")
     figuras = [
         ("05_boxplots.png", "Medidas que separan benignos de sospechosos (Mann-Whitney con Holm)"),
