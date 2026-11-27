@@ -43,6 +43,7 @@ No hace falta instalar un numpy viejo para pylidc: `tpi/compat.py` recrea los al
 | 13 | `python scripts/13_puntaje_robusto_estricto.py [--anclaje hibrido --sigma-e2 lidc]` | Puntaje robusto con TODA la selección (también el CCC) dentro de cada pliegue | No |
 | 14 | `python scripts/14_figura_nitidez_borde.py` | Figura que explica cómo se mide la nitidez del borde | Cortes |
 | 15 | `python scripts/15_calcio_informe.py` | Calcio para el informe: especificidad y sensibilidad, AUC, boxplot de tres grupos con Holm, AUC del diámetro por estrato (A5), Spearman parcial con tamaño y calcio como covariables (A6) y umbral de fracción 0-10 % (A7) | No |
+| 16 | `python scripts/16_figura_ruido_informe.py` | Figura 5 del informe: AUC del interior y del diámetro según el ruido agregado en HU, con los tres escenarios de ruido electrónico (σe² = 0, 6 y 34), y calcio falso con el umbral simple vs el calcio robusto. Lee los CSV del 07 y del 08 | No |
 
 ## Interfaz gráfica
 
